@@ -9,7 +9,7 @@ import { CarProvider } from './../providers/car/car';
 import { PickupDirective } from './../pickup/pickup';
 import { Observable } from 'rxjs/Rx';
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
-import { NavController, LoadingController, Platform, ModalController, NavParams } from 'ionic-angular';
+import { NavController, LoadingController, ToastController,Platform,AlertController, ModalController, NavParams } from 'ionic-angular';
 import { AvailbleCarDirective } from './available-cars/available-cars';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Dialogs } from '@ionic-native/dialogs';
@@ -66,8 +66,8 @@ export class MapDirective implements OnInit,OnChanges  {
      start_end:boolean=false;
      startMarker:any;
      endMarker:any;
-    constructor(  public loading:LoadingController,public platform:Platform, public http:Http, 
-        private dialog:Dialogs,public pick:PickupDirective,public geo:Geolocation,
+    constructor( public toast:ToastController, public loading:LoadingController,public platform:Platform, public http:Http, 
+        private dialog:AlertController,public pick:PickupDirective,public geo:Geolocation,
         public afDatabase:AngularFireDatabase,public modal:ModalController
   ){
 //      
@@ -78,6 +78,8 @@ export class MapDirective implements OnInit,OnChanges  {
    
      
     if(this.platform.is('android')){
+
+
         window["plugins"].OneSignal
 .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
 .handleNotificationOpened((jsonData)=> {
@@ -96,12 +98,12 @@ export class MapDirective implements OnInit,OnChanges  {
 })
 .endInit();
     }else{
-        let modal = this.modal.create(NotifiedPage);
-        let me = this;
-        modal.onDidDismiss(data => {
+        // let modal = this.modal.create(NotifiedPage);
+        // let me = this;
+        // modal.onDidDismiss(data => {
         
-        });
-        modal.present();
+        // });
+        // modal.present();
     }
       
     //  let headers = new Headers({ 'Authorization': 'Bearer Xw8t8tVjgtT0t--jRrsD7oFqZEq2AFBIjF9XSwoqAuYAAAFdv6Kaqg' });
@@ -196,51 +198,81 @@ export class MapDirective implements OnInit,OnChanges  {
                        var create_date=complex.split("$")[7];
                        var tokenId=complex.split("$")[8];
                        var user=complex.split("$")[9];
-                       
-                        this.dialog.confirm("배달 신청하시겠습니까?", "확인").then((y)=>{
-                            console.log("yessss"+y)
-                        }).catch((n)=>{
-                            console.log("nooo"+n)
-                        })
-                        this.request.create_date=create_date;
-                        this.request.startPoint=startPoint;
-                        this.request.endPoint=endPoint;
-                        this.request.startLat=parseInt(startLat);
-                        this.request.endLat=parseInt(endLat);
-                        this.request.endLng=parseInt(endLng);
-                        this.request.startLng=parseInt(startLng);
-                        this.request.user="ksks";
-                        this.request.status="assigned";
+                       this.request.create_date=create_date;
+                       this.request.startPoint=startPoint;
+                       this.request.endPoint=endPoint;
+                       this.request.startLat=parseInt(startLat);
+                       this.request.endLat=parseInt(endLat);
+                       this.request.endLng=parseInt(endLng);
+                       this.request.startLng=parseInt(startLng);
+                       this.request.user="ksks";
+                       this.request.status="assigned";
+                      
+                       var notificationObj = {title:{en:"배달원 지정안내"}, contents: {en:"칙칙폭폭 배달원이 지정되었습니다.\n 확인해보세요"},
+                       "data": {"welcome": true, "name":"pdJung"},
+                       include_player_ids: [tokenId]};
+                        
+                        
                         //  this.afDatabase.list('/requestedList/assigned').push(this.request);
 
-                        var notificationObj = {title:{en:"배달원 지정안내"}, contents: {en:"칙칙폭폭 배달원이 지정되었습니다.\n 확인해보세요"},
-                                            "data": {"welcome": true, "name":"pdJung"},
-                                            include_player_ids: [tokenId]};
+                        let alert = this.dialog.create({
+                            title: 'Confirm purchase',
+                            message: '배달 신청하시겠습니까?',
+                            buttons: [
+                              {
+                                text: '취소',
+                                role: 'cancel',
+                                handler: () => {
+                                  console.log('Cancel clicked');
+                                 
+                                }
+                              },
+                              {
+                                text: '신청',
+                                handler: () => {
+                                    window["plugins"].OneSignal.postNotification(notificationObj,
+                                        function(successResponse) {
+
+                                            let toast = this.toast.create({
+                                                message: '전송되었습니다.',
+                                                duration: 3000,
+                                                position: 'middle'
+                                              });
+                                            
+                                              toast.onDidDismiss(() => {
+                                                console.log('Dismissed toast');
+                                              });
+                                            
+                                              toast.present();
+
+                                        },
+                                        function (failedResponse) {
+                                        console.log("Notification Post Failed: ", failedResponse);
+                                        });
+                                }
+                              }
+                            ]
+                          });
+                          alert.present();
                         if(this.platform.is('android')){
-                            window["plugins"].OneSignal.postNotification(notificationObj,
-                                function(successResponse) {
-                                },
-                                function (failedResponse) {
-                                console.log("Notification Post Failed: ", failedResponse);
-                                alert("Notification Post Failed:\n" + JSON.stringify(failedResponse));
-                                });
+                           
+                           
                         }else{
                             
 
-                            let data={
-                                "app_id": "2192c71b-49b9-4fe1-bee8-25617d89b4e8", 
-                         "include_player_ids": ["f474e684-6d7a-4546-810d-140a1c153b54"],
-                         "data": {"welcome": true, "name":"pdJung"},
-                         "contents": {"en": "한글 테스트"}
-                            }
-                            let headers = new Headers({ 'Content-Type': 'application/json' });
-                           let options = new RequestOptions({ headers: headers });
+                        //     let data={
+                        //         "app_id": "2192c71b-49b9-4fe1-bee8-25617d89b4e8", 
+                        //  "include_player_ids": ["f474e684-6d7a-4546-810d-140a1c153b54"],
+                        //  "data": {"welcome": true, "name":"pdJung"},
+                        //  "contents": {"en": "한글 테스트"}
+                        //     }
+                        //     let headers = new Headers({ 'Content-Type': 'application/json' });
+                        //    let options = new RequestOptions({ headers: headers });
 
-                             this.http.post('https://onesignal.com/api/v1/notifications', data, options).toPromise().then((res)=>{
-                                console.log(res.json())
-                            }).catch((error)=>{
-                                alert(error);
-                            })
+                        //      this.http.post('https://onesignal.com/api/v1/notifications', data, options).toPromise().then((res)=>{
+                        //         console.log(res.json())
+                        //     }).catch((error)=>{
+                        //     })
 
                         }
                        
