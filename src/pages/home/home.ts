@@ -73,7 +73,12 @@ export class HomePage implements OnInit,OnChanges  {
     private geo:Geolocation,private afDatabase:AngularFireDatabase,public afAuth : AngularFireAuth
   ,public metro: MetroServiceProvider,private oneSignal: OneSignal, public platform:Platform,private backgroundGeolocation: BackgroundGeolocation,public http:Http) {
     var id=localStorage.getItem("id");
-
+    if(id!=undefined||id!=null){
+    this.userId=id;
+    }else{
+    this.userId="admin"
+    }
+     
     this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
        this.it.subscribe(snapshots=>{
          snapshots.forEach(element => {
@@ -90,11 +95,7 @@ export class HomePage implements OnInit,OnChanges  {
     var result_metro=this.metro.getMetro().subscribe(data=>{
       this.result_metro=data;
     });
-    if(id!=undefined||id!=null){
-      this.userId=id;
-    }else{
-      this.userId="admin"
-    }
+    
     if(this.platform.is('android')){
        window["plugins"].OneSignal
                         .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
@@ -271,41 +272,43 @@ var distance = google.maps.geometry.spherical.computeDistanceBetween(new google.
           window["plugins"].OneSignal.getIds((idx)=>{
            this.request.tokenId=idx.userId
            this.afDatabase.object('/requestedList/requestedAll/'+todayNoTime+'/'+orderNo).set(this.request).then((suc)=>{
-           }).catch((error)=>{
-             alert(error)
-           })
-           this.afDatabase.object('/requestedList/requested/'+todayNoTime+'/'+orderNo).set(this.request).then((success)=>{
-            this.totalOrder=[];
-            alert("입력성공")
-            
-            this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
-           this.it.subscribe(snapshots=>{
-             snapshots.forEach(element => {
-               
-                var keysFiltered = Object.keys(element.val()).filter(function(item){return !( element.val()[item] == undefined)});
-          
-        var valuesFiltered = keysFiltered.map((item)=> {
-              this.totalOrder.push(item);
-              
-             });
-           })
-           })
-            this.afAuth.authState.subscribe(auth=>{
-           if(auth!=null||auth!=undefined){
-           this.afDatabase.list('/profile/'+auth.uid+'/request').push(this.request).then((success)=>{
-             
           }).catch((error)=>{
-              alert(error);
-            })
-            }
-            
+            alert(error)
           })
-        }).catch((error)=>{
-          alert(error);
-        })
+          this.afDatabase.object('/requestedList/requested/'+todayNoTime+'/'+orderNo).set(this.request).then((success)=>{
+           this.totalOrder=[];
+           alert("입력성공")
+           
+           this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
+          this.it.subscribe(snapshots=>{
+            snapshots.forEach(element => {
+              
+               var keysFiltered = Object.keys(element.val()).filter(function(item){return !( element.val()[item] == undefined)});
+         
+       var valuesFiltered = keysFiltered.map((item)=> {
+             this.totalOrder.push(item);
+             
+            });
+          })
+          })
+           this.afAuth.authState.subscribe(auth=>{
+          if(auth!=null||auth!=undefined){
+          this.afDatabase.list('/profile/'+auth.uid+'/request').push(this.request).then((success)=>{
+            
+         }).catch((error)=>{
+             alert(error);
+           })
+           }
+           
+         })
+       }).catch((error)=>{
+         alert(error);
+       })
         })
         }else{
-          alert("웹에서는 사용불가");
+          console.log("this.request");
+          console.log(this.request);
+          
         }
   
        

@@ -66,6 +66,7 @@ export class MapDirective implements OnInit,OnChanges  {
      start_end:boolean=false;
      startMarker:any;
      endMarker:any;
+     userId:string;
     constructor( public toast:ToastController, public loading:LoadingController,public platform:Platform, public http:Http, 
         private dialog:AlertController,public pick:PickupDirective,public geo:Geolocation,
         public afDatabase:AngularFireDatabase,public modal:ModalController
@@ -73,7 +74,12 @@ export class MapDirective implements OnInit,OnChanges  {
 //      
 // 
    
- 
+    var id=localStorage.getItem("id");
+    if(id!=undefined||id!=null){
+    this.userId=id;
+    }else{
+    this.userId="admin"
+    }
      
    
      
@@ -146,7 +152,7 @@ export class MapDirective implements OnInit,OnChanges  {
 
 
         
-          this.requestedRoute.push({tokenId:element.val()[item].tokenId,key:element.key ,endLng:element.val()[item].endLng,user:element.val()[item].user,endLat:element.val()[item].endLat ,lat:element.val()[item].startLat,lng:element.val()[item].startLng,create_date:element.val()[item].create_date, startPoint:element.val()[item].startPoint,endPoint:element.val()[item].endPoint,status:element.val()[item].status},
+          this.requestedRoute.push({orderNo:element.val()[item].orderNo,tokenId:element.val()[item].tokenId,key:element.key ,endLng:element.val()[item].endLng,user:element.val()[item].user,endLat:element.val()[item].endLat ,lat:element.val()[item].startLat,lng:element.val()[item].startLng,create_date:element.val()[item].create_date, startPoint:element.val()[item].startPoint,endPoint:element.val()[item].endPoint,status:element.val()[item].status},
           {lat:element.val()[item].endLat,lng:element.val()[item].endLng,create_date:element.val()[item].create_date, startPoint:element.val()[item].startPoint,endPoint:element.val()[item].endPoint,status:element.val()[item].status})
           console.log(this.requestedRoute);
           console.log(this.requestedRoute.length);
@@ -179,7 +185,7 @@ export class MapDirective implements OnInit,OnChanges  {
                 })
                 this.markerStart.push(Marker)
                 let popup=new google.maps.InfoWindow({
-                    content:'<p>'+this.requestedRoute[(i-1)].tokenId+'</p><p> 출발역 : '+this.requestedRoute[(i-1)].startPoint+'</p><p>도착역 :'+this.requestedRoute[(i-1)].endPoint+'</p><p> 발생일 : '+this.requestedRoute[(i-1)].create_date+'</p> <button id="myid" value="'+this.requestedRoute[(i-1)].key+'$'+this.requestedRoute[(i-1)].startPoint+'$'+this.requestedRoute[(i-1)].endPoint+'$'+this.requestedRoute[(i-1)].lat+'$'+this.requestedRoute[(i-1)].lng+'$'+this.requestedRoute[(i-1)].endLat+'$'+this.requestedRoute[(i-1)].endLng+'$'+this.requestedRoute[(i-1)].create_date+'$'+this.requestedRoute[(i-1)].tokenId+'$'+this.requestedRoute[(i-1)].user+'">신청</button>'
+                    content:'<p>'+this.requestedRoute[(i-1)].orderNo+'</p><p>'+this.requestedRoute[(i-1)].tokenId+'</p><p> 출발역 : '+this.requestedRoute[(i-1)].startPoint+'</p><p>도착역 :'+this.requestedRoute[(i-1)].endPoint+'</p><p> 발생일 : '+this.requestedRoute[(i-1)].create_date+'</p> <button id="myid" value="'+this.requestedRoute[(i-1)].key+'$'+this.requestedRoute[(i-1)].startPoint+'$'+this.requestedRoute[(i-1)].endPoint+'$'+this.requestedRoute[(i-1)].lat+'$'+this.requestedRoute[(i-1)].lng+'$'+this.requestedRoute[(i-1)].endLat+'$'+this.requestedRoute[(i-1)].endLng+'$'+this.requestedRoute[(i-1)].create_date+'$'+this.requestedRoute[(i-1)].tokenId+'$'+this.requestedRoute[(i-1)].user+'$'+this.requestedRoute[(i-1)].orderNo+'">신청</button>'
                 });
               
                 Marker.addListener('click',()=>{
@@ -198,6 +204,7 @@ export class MapDirective implements OnInit,OnChanges  {
                        var create_date=complex.split("$")[7];
                        var tokenId=complex.split("$")[8];
                        var user=complex.split("$")[9];
+                       var orderNo=complex.split("$")[10];
                        this.request.create_date=create_date;
                        this.request.startPoint=startPoint;
                        this.request.endPoint=endPoint;
@@ -205,15 +212,31 @@ export class MapDirective implements OnInit,OnChanges  {
                        this.request.endLat=parseInt(endLat);
                        this.request.endLng=parseInt(endLng);
                        this.request.startLng=parseInt(startLng);
-                       this.request.user="ksks";
+                       this.request.user=this.userId;
                        this.request.status="assigned";
+                       this.request.orderNo=orderNo;
+                       this.request.onlyDate=create_date.substring(0,10);
+                       console.log("?s")
+                       console.log(this.request.orderNo)
+                       let today = new Date();
+                       let dd:number;
+                       let day:string;
+                       let month:string;
+                        dd = today.getDate();
+                       var mm = today.getMonth()+1; //January is 0!
+               
+                       var yyyy = today.getFullYear();
+                      var time=new Date().toLocaleTimeString('en-US', { hour12: false,hour: "numeric",minute: "numeric"});
                       
+                       dd<10?day='0'+dd:day=''+dd;
+                       mm<10?month='0'+mm:month=''+mm;
+                       let todayNoTime= yyyy+" "+mm+" "+dd;
                        var notificationObj = {title:{en:"배달원 지정안내"}, contents: {en:"칙칙폭폭 배달원이 지정되었습니다.\n 확인해보세요"},
-                       "data": {"welcome": true, "name":"pdJung"},
+                       "data": {"welcome": true, "name":this.userId},
                        include_player_ids: [tokenId]};
                         
                         
-                        //  this.afDatabase.list('/requestedList/assigned').push(this.request);
+                        //  
 
                         let alert = this.dialog.create({
                             title: 'Confirm purchase',
@@ -223,8 +246,8 @@ export class MapDirective implements OnInit,OnChanges  {
                                 text: '취소',
                                 role: 'cancel',
                                 handler: () => {
-                                  console.log('Cancel clicked');
-                                 
+                                    console.log("cancelded")
+                                    
                                 }
                               },
                               {
@@ -232,7 +255,9 @@ export class MapDirective implements OnInit,OnChanges  {
                                 handler: () => {
                                     window["plugins"].OneSignal.postNotification(notificationObj,
                                         function(successResponse) {
-
+                                            this.afDatabase.object('/requestedList/assigned/'+todayNoTime+'/'+orderNo).set(this.request);
+                                            this.afDatabase.object('/requestedList/requestedAll/'+todayNoTime+'/'+orderNo).set(this.request);
+                                            this.afDatabase.object('/requestedList/requested/'+todayNoTime+'/'+orderNo).remove();
                                             let toast = this.toast.create({
                                                 message: '전송되었습니다.',
                                                 duration: 3000,
