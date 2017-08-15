@@ -87,16 +87,16 @@
   </div> -->
 </ion-content>
 
-
 <ion-menu [content]="content">
   <ion-header>
     <ion-toolbar>
-      <ion-title>Menu</ion-title>
+      <ion-title class="title_menu">Menu {{imageUrl}}</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-content>
+  <ion-content class="c">
     <ion-list>
       <ion-list>
+          <img class="img" src="{{imageUrl}}">
             <button menuClose ion-item *ngFor="let p of pages" [class.activeHighlight]="checkActive(p)" (click)="openPage(p)">{{p.title}}</button>
         </ion-list>
     </ion-list>

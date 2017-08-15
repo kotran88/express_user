@@ -181,7 +181,7 @@ export class MapDirective implements OnInit,OnChanges  {
                 let Marker=new google.maps.Marker({
                     map : this.map,
                     position:this.requestedRoute[(i-1)],
-                    icon:'assets/icon/start.png'
+                    icon:'assets/icon/start2.png'
                 })
                 this.markerStart.push(Marker)
                 let popup=new google.maps.InfoWindow({
@@ -543,7 +543,7 @@ centerLocation(location){
                     let startMarker=new google.maps.Marker({
                         map : map,
                         position:location,
-                        icon:'assets/icon/start.png'
+                        icon:'assets/icon/start2.png'
                     })
                 }else
                 {

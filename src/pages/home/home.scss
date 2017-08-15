@@ -10,14 +10,31 @@ page-home {
         line-height:3rem;
         float:left;
         padding:0;
-        width: 25%;
+        width: 30%;
+    }
+    .title_menu{
+        width:35%;
+    }
+    .header header-md{
+        height:30%;
+    }
+    title title-md{
+        height:30%;
+    }
+    .img{
+        border-radius: 50%;
     }
     button.nav{
         background-color:transparent;
       color:#000;
       float:right;
     }
-  
+  .c{
+      .scroll-content{
+        top:35%;
+      }
+      
+  }
   .scroll-content {
         overflow: hidden;
         padding-bottom: 0px;

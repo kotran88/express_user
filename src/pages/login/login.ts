@@ -106,9 +106,9 @@ export class LoginPage implements OnInit {
     }).then((res)=>{
       firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(res.idToken)).then(
         suc=>{
-          alert(res.email.split("@")[0])
           localStorage.setItem("id", res.email.split("@")[0]);
-        // alert(localStorage.getItem("lastname"));
+          localStorage.setItem("foto",res.imageUrl);
+         alert(localStorage.getItem("foto"));
           this.navCtrl.setRoot(HomePage)
         }).catch(ns=>{
           alert("fail"+ns);

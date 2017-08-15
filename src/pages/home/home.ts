@@ -69,10 +69,12 @@ export class HomePage implements OnInit,OnChanges  {
   public lat: number = 0;
   public lng: number = 0;
   totalOrder=[];
+  imageUrl:string;
   constructor(public m : MapDirective, public navCtrl: NavController,public navParam:NavParams ,public mapDirective:MapDirective, public modalCtrl:ModalController, public loading:LoadingController, public fb:FirebaseService, 
     private geo:Geolocation,private afDatabase:AngularFireDatabase,public afAuth : AngularFireAuth
   ,public metro: MetroServiceProvider,private oneSignal: OneSignal, public platform:Platform,private backgroundGeolocation: BackgroundGeolocation,public http:Http) {
     var id=localStorage.getItem("id");
+    this.imageUrl=localStorage.getItem("foto");
     if(id!=undefined||id!=null){
     this.userId=id;
     }else{
@@ -120,7 +122,7 @@ export class HomePage implements OnInit,OnChanges  {
     // alert(localStorage.getItem("lastname"));
     this.pages=[
         
-        {title:'page 2',component:HomePage},
+        {title:'page 23',component:HomePage},
         {title:'Log in',component:LoginPage},
         {title:'View Request List',component:ViewRequestListPage}
       ]
