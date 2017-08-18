@@ -11,4 +11,5 @@ export interface request{
     tokenId:string
     orderNo:string
     onlyDate:string
+    deliveryGuy:string
 }

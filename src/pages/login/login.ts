@@ -1,3 +1,4 @@
+import { Profile_User } from './../../components/models/profile';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { PhoneNumber } from './../../components/models/phonenumber';
 import { ProfilePage } from './../../pages/profile/profile';
@@ -5,7 +6,7 @@ import { User } from './../../components/models/user';
 import { SignupPage } from './../signup/signup';
 import { HomePage } from './../../pages/home/home';
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { AngularFireModule} from 'angularfire2';
 import firebase from 'firebase';
@@ -25,14 +26,16 @@ import { AngularFireAuth } from 'angularfire2/auth';
 })
 export class LoginPage implements OnInit {
   windowRef:any;
+  profile={} as Profile_User;
   user={} as User;
+  items : any;
   phoneNumber = new PhoneNumber()
-
+  checked:boolean=false;
   verificationCode: string;
 
   users: any;
     requestToken:any;
-  constructor(public navCtrl: NavController,public googleplus:GooglePlus,public afauth:AngularFireAuth,public afd:AngularFireDatabase) {
+  constructor(public toast:ToastController, public afAuth : AngularFireAuth,public afDatabase:AngularFireDatabase, public navCtrl: NavController,public googleplus:GooglePlus,public afauth:AngularFireAuth,public afd:AngularFireDatabase) {
   
    
 
@@ -101,15 +104,73 @@ export class LoginPage implements OnInit {
     }
     }
   googleLogin(){
+
+    
     this.googleplus.login({
       'webClientId':'916589339698-n71c3mmpsclus88rk6fp99la7sh0vnga.apps.googleusercontent.com'
     }).then((res)=>{
       firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(res.idToken)).then(
         suc=>{
-          localStorage.setItem("id", res.email.split("@")[0]);
-          localStorage.setItem("foto",res.imageUrl);
-         alert(localStorage.getItem("foto"));
-          this.navCtrl.setRoot(HomePage)
+
+          this.afAuth.authState.subscribe(auth=>{
+            var count=0;
+            localStorage.setItem("id", res.email.split("@")[0]);
+            localStorage.setItem("foto",res.imageUrl);
+            this.items=this.afDatabase.list('profile/'+auth.uid, { preserveSnapshot: true })
+            this.items.subscribe(snapshots=>{
+              if(snapshots.length==0){
+                this.profile.first=false;
+                this.profile.id="null";
+                this.profile.created_date="null";
+                this.profile.foto="null";
+                this.afDatabase.object('profile/'+auth.uid+'/').set(this.profile)
+                .then(() => {  this.navCtrl.setRoot(ProfilePage);   } ).catch((error)=> alert("err : "+error))
+              }else{
+                if(snapshots.forEach(element=>{
+                  if(element.key=="first"){
+                    count++;
+                    if(element.val()==true){
+
+                      if(count==1){
+                        let toast = this.toast.create({
+                          message: '로그인되었습니다.',
+                          duration: 1000,
+                          position: 'middle'
+                        });
+                      
+                        toast.onDidDismiss(() => {
+                          this.navCtrl.setRoot(HomePage);
+                        });
+                      
+                        toast.present();
+                        
+                      }
+                    }else{
+                      if(count==1){
+
+                        this.navCtrl.setRoot(ProfilePage);
+                      }else{
+                        alert("goto home")
+                        this.navCtrl.setRoot(HomePage)
+                      }
+                    }
+                    
+                  }
+                }))
+                if(this.checked){
+                 
+                  
+                }else{
+                
+                }
+                
+              }
+          })
+            
+            
+          })
+          
+          
         }).catch(ns=>{
           alert("fail"+ns);
         })

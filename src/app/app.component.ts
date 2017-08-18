@@ -9,18 +9,13 @@ import { HomePage } from '../pages/home/home';
   templateUrl: 'app.html'
 })
 export class MyApp {
-  rootPage:any = HomePage;
+  rootPage:any = LoginPage;
   pages: Array<{title:string,component:any}>;
   activePage:any;
   @ViewChild(Nav) nav:Nav
   constructor(platform: Platform,statusBar: StatusBar, splashScreen: SplashScreen) {
     platform.ready().then(() => {
-      this.pages=[
-        {title:'page One',component:LoginPage},
-        {title:'page 2',component:HomePage}
-      ]
-    
-      this.activePage=this.pages[0];
+      
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();

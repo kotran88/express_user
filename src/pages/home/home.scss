@@ -6,6 +6,17 @@ page-home {
      height: 5rem;
     font-size: 1.5rem;
 }
+.floating{
+    padding:10px;
+    border-radius:10px;
+    top:7%;
+    color:white;
+    background-color:white;
+    position: absolute;
+    z-index: 100;
+    left:95%;
+    
+}
     .title{
         line-height:3rem;
         float:left;
@@ -13,7 +24,7 @@ page-home {
         width: 30%;
     }
     .title_menu{
-        width:35%;
+        width:100%;
     }
     .header header-md{
         height:30%;
@@ -30,11 +41,27 @@ page-home {
       float:right;
     }
   .c{
+      .profile{
+        text-align: center;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 2rem;
+      }
+      
+        top:0%;
       .scroll-content{
-        top:35%;
+          .list list-md{
+              text-align: center;
+          }
+        top:0%;
+      }
+      .img{
+          max-width:40%;
       }
       
   }
+
   .scroll-content {
         overflow: hidden;
         padding-bottom: 0px;

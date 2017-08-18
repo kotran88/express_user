@@ -1,3 +1,4 @@
+import { GooglePlus } from '@ionic-native/google-plus';
 import { MetroServiceProvider } from './../../providers/metro-service/metro-service';
 import { ViewRequestListPage } from './../view-request-list/view-request-list';
 import { ViewRequestedAllPage } from './../view-requested-all/view-requested-all';
@@ -60,7 +61,7 @@ export class HomePage implements OnInit,OnChanges  {
   it:any;
   result=[];
   isToggled:boolean=false;
-  pages: Array<{title:string,component:any}>;
+  pages: Array<{title:string,component:any,attr:any}>;
   requestedRoute=[];
   firestore=firebase.database().ref('/pushtokens');
   firemsg=firebase.database().ref('/messages');
@@ -71,7 +72,7 @@ export class HomePage implements OnInit,OnChanges  {
   totalOrder=[];
   imageUrl:string;
   constructor(public m : MapDirective, public navCtrl: NavController,public navParam:NavParams ,public mapDirective:MapDirective, public modalCtrl:ModalController, public loading:LoadingController, public fb:FirebaseService, 
-    private geo:Geolocation,private afDatabase:AngularFireDatabase,public afAuth : AngularFireAuth
+    private geo:Geolocation,private afDatabase:AngularFireDatabase,public afAuth : AngularFireAuth,private googleplus:GooglePlus
   ,public metro: MetroServiceProvider,private oneSignal: OneSignal, public platform:Platform,private backgroundGeolocation: BackgroundGeolocation,public http:Http) {
     var id=localStorage.getItem("id");
     this.imageUrl=localStorage.getItem("foto");
@@ -79,6 +80,10 @@ export class HomePage implements OnInit,OnChanges  {
     this.userId=id;
     }else{
     this.userId="admin"
+    }
+
+    if(this.imageUrl==undefined){
+      this.imageUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png"
     }
      
     this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
@@ -122,9 +127,9 @@ export class HomePage implements OnInit,OnChanges  {
     // alert(localStorage.getItem("lastname"));
     this.pages=[
         
-        {title:'page 23',component:HomePage},
-        {title:'Log in',component:LoginPage},
-        {title:'View Request List',component:ViewRequestListPage}
+        {title:'로그인',component:LoginPage,attr:"Login"},
+        {title:'나의 주문 목록 보기',component:ViewRequestListPage,attr:"request"},
+        {title:'로그아웃',component:ViewRequestListPage,attr:"Logout"}
       ]
       this.activePage=this.pages[0];
     this.address = {
@@ -137,8 +142,18 @@ export class HomePage implements OnInit,OnChanges  {
     this.navCtrl.push(ViewRequestedAllPage,{userId:this.userId})
   }
    openPage(page){
-    this.navCtrl.setRoot(page.component);
-    this.activePage=page;
+    if(page.attr=="Logout"){
+      if(this.platform.is("android")){
+
+        this.googleplus.logout();
+      }else{
+        alert("not web")
+      }
+    }else{
+      this.navCtrl.setRoot(page.component);
+      this.activePage=page;
+    }
+    
   }
   checkActive(page){
     return page==this.activePage;

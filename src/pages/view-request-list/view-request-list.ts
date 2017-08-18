@@ -14,10 +14,51 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class ViewRequestListPage {
   items:any;
+  userId:string;
+  shown:any;
+  result=[];
+ 
+  result_date=[];
   constructor(public navCtrl: NavController, public navParams: NavParams,public afd:AngularFireDatabase) {
-    this.items=this.afd.list('profile/zNwZNIwW4MeOfiqskhxfY15imwn2/request')
+    var id=localStorage.getItem("id");
+    if(id!=undefined||id!=null){
+    this.userId=id;
+    }else{
+    this.userId="admin"
+    }
+    
+   this.items=this.afd.list('/requestedList/requestedAll', { preserveSnapshot: true })
+     console.log("snapshot????????????????????????????")
+     console.log(this.items);
+    this.items.subscribe(snapshots=>{
+     console.log(snapshots);
+  
+     snapshots.forEach(element => {
+       console.log("key value");
+       console.log(element.key);
+         console.log(element.val());
+        var keysFiltered = Object.keys(element.val()).filter(function(item){return !( element.val()[item] == undefined)});
+   
+  var valuesFiltered = keysFiltered.map((item)=> {
+    if(element.val()[item].user==this.userId){
+      console.log(item);
+      console.log(element.val()[item]);
+     
+      this.result_date.push(element.val()[item].onlyDate)
+      console.log("rrresult")
+      console.log(this.result_date);
+      this.result.push(element.val()[item])
+        console.log(this.result);
+        this.result_date=Array.from(new Set(this.result_date))
+        console.log(this.result_date);
+    }
+   
+  });
+  
+     })
+    })
   }
-
+ 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ViewRequestListPage');
   }

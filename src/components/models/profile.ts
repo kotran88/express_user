@@ -1,6 +1,6 @@
 export interface Profile_User{
-    username:string;
-    firstName:string;
+    id:string;
     foto:string;
-    google:boolean;
+    created_date:string;
+    first:boolean;
 }

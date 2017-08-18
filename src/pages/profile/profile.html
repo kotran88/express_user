@@ -14,13 +14,15 @@
 
 
 <ion-content padding>
-   <ion-item>
-    <ion-label floating>UserName</ion-label>
-    <ion-input [(ngModel)]="profile.username"></ion-input>
+  <button ion-button (click)="dupulicate()">중복검사</button>
+  <p *ngIf="start;else o">시작</p>
+  <ng-template #o><p *ngIf="dup;else other">중복입니다.</p></ng-template>
+  
+  <ng-template #other>사용 가능입니다.</ng-template>
+  <ion-item>
+    <ion-label floating>USER ID</ion-label>
+    <ion-input [(ngModel)]="profile.id"></ion-input>
+    
   </ion-item>
-   <ion-item>
-    <ion-label floating>First Name</ion-label>
-    <ion-input [(ngModel)]="profile.firstName"></ion-input>
-  </ion-item>
-   <button ion-button clear block (click)="createProfile()"> create profile2 </button>
+   <button ion-button clear block (click)="createProfile()"> 다음 </button>
 </ion-content>

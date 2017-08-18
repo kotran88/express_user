@@ -7,12 +7,11 @@
       지하철택배(배달원)
     </div>
       <ion-toggle [(ngModel)]="isToggled" style="float:right"  (ionChange)="notify()">activate</ion-toggle>
-   
-      <button class="nav"  ion-button (click)="viewRequestedAll()">history</button>
+      <button class="nav" (click)="map.centerLocation()" ion-button >
+          <ion-icon name="navigate" ></ion-icon>
+        </button>
      
-     <button class="nav" (click)="map.centerLocation()" ion-button >
-      <ion-icon name="navigate" ></ion-icon>
-    </button>
+     
       <!-- <button ion-button > </button> -->
       
   </ion-navbar>
@@ -20,7 +19,9 @@
 </ion-header>
 
 <ion-content scroll="false" class="home">
-
+  <!-- <div class="floating">
+      
+  </div> -->
   <div class="upper" id="upper">
     <ion-row >
       <ion-col width-100> 
@@ -90,13 +91,17 @@
 <ion-menu [content]="content">
   <ion-header>
     <ion-toolbar>
-      <ion-title class="title_menu">Menu {{imageUrl}}</ion-title>
+      <ion-title class="title_menu">메뉴뉴뉴뉴</ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-content class="c">
     <ion-list>
       <ion-list>
-          <img class="img" src="{{imageUrl}}">
+          <div class="profile">
+              <img class="img" src="{{imageUrl}}"/>
+              <p>{{userId}}</p>
+          </div>
+          
             <button menuClose ion-item *ngFor="let p of pages" [class.activeHighlight]="checkActive(p)" (click)="openPage(p)">{{p.title}}</button>
         </ion-list>
     </ion-list>
