@@ -26,6 +26,7 @@ import { FormsModule } from '@angular/forms';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
+import { ChatPage } from '../pages/chat/chat';
 import { Geolocation } from '@ionic-native/geolocation';
 import { CarProvider } from '../providers/car/car';
 import { SimulateProvider } from '../providers/simulate/simulate';
@@ -63,7 +64,8 @@ import { MetroServiceProvider } from '../providers/metro-service/metro-service';
     EndPage,
     ViewRequestListPage,
     ViewRequestedAllPage,
-    NotifiedPage
+    NotifiedPage,
+    ChatPage
 
   ],
   imports: [
@@ -90,7 +92,8 @@ import { MetroServiceProvider } from '../providers/metro-service/metro-service';
     EndPage,
     ViewRequestListPage,
     ViewRequestedAllPage,
-    NotifiedPage
+    NotifiedPage,
+    ChatPage
     
     
   ],

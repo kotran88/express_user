@@ -27,7 +27,6 @@ export class ProfilePage {
   nodup:boolean=false;
   constructor(public navCtrl: NavController, public navParams: NavParams,private afAuth : AngularFireAuth, private afDatabase : AngularFireDatabase) {
     this.start=true;
-    alert("thisisprofile page")
       //  this.profile.foto="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png";
       //  this.profile.first=true;
   }

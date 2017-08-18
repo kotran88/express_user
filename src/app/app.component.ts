@@ -9,7 +9,7 @@ import { HomePage } from '../pages/home/home';
   templateUrl: 'app.html'
 })
 export class MyApp {
-  rootPage:any = LoginPage;
+  rootPage:any = HomePage;
   pages: Array<{title:string,component:any}>;
   activePage:any;
   @ViewChild(Nav) nav:Nav

@@ -1,7 +1,8 @@
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
-
+import { IonicPage,ViewController, NavController, NavParams } from 'ionic-angular';
+import { HomePage } from './../home/home';
+import { ChatPage } from './../chat/chat';
 /**
  * Generated class for the ViewRequestListPage page.
  *
@@ -19,7 +20,7 @@ export class ViewRequestListPage {
   result=[];
  
   result_date=[];
-  constructor(public navCtrl: NavController, public navParams: NavParams,public afd:AngularFireDatabase) {
+  constructor(public navCtrl: NavController,public viewCtrl:ViewController ,public navParams: NavParams,public afd:AngularFireDatabase) {
     var id=localStorage.getItem("id");
     if(id!=undefined||id!=null){
     this.userId=id;
@@ -58,7 +59,12 @@ export class ViewRequestListPage {
      })
     })
   }
- 
+  chat(itemObject){
+    this.navCtrl.push(ChatPage,{item:itemObject})
+  }
+  goBack(){
+    this.navCtrl.setRoot(HomePage)
+  }
   ionViewDidLoad() {
     console.log('ionViewDidLoad ViewRequestListPage');
   }

@@ -6,16 +6,20 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>나의 배달 리스트</ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <button start class="nav" (click)="goBack()" ion-button >
+          <ion-icon name="arrow-back" ></ion-icon>
+        </button>
+        <div class="title_title">
+          지하철택배(배달원)
+        </div>
+      </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
     <ion-list>
-        <h5>나의 배달 리스트 </h5>
         <p *ngFor="let item of result_date">{{item}}
             <ion-item  >
                     <ion-card  *ngFor="let item2 of result" >
@@ -26,8 +30,9 @@
                         <ion-card-content>
                         출발역:  {{item2.startPoint}} &nbsp; &nbsp; <br>
                         도착역:  {{item2.endPoint}} &nbsp; &nbsp; <br>
-                        신청시간 {{item2.create_date}}
-                        현재상태 :  {{item2.status}} &nbsp; &nbsp; <br>
+                        신청시간 {{item2.create_date}}<br>
+                        
+                        현재상태 :  {{item2.status}} &nbsp; <button *ngIf="item2.status=='assigned'" class="chat" ion-button (click)="chat(item2)">Chat</button> <br>
                         </ion-card-content>
                       </p>
                     </ion-card  >
