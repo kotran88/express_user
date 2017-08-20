@@ -26,13 +26,15 @@
                       <p *ngIf="item === item2.onlyDate">
                         <ion-card-header>
                         오더번호 : {{item2.orderNo}}
+                        <button *ngIf="item2.status=='assigned'" style="float:right" class="chat" ion-button (click)="chat(item2)">Chat</button> 
+                        
                         </ion-card-header>
-                        <ion-card-content>
+                         <ion-card-content>
                         출발역:  {{item2.startPoint}} &nbsp; &nbsp; <br>
                         도착역:  {{item2.endPoint}} &nbsp; &nbsp; <br>
                         신청시간 {{item2.create_date}}<br>
                         
-                        현재상태 :  {{item2.status}} &nbsp; <button *ngIf="item2.status=='assigned'" class="chat" ion-button (click)="chat(item2)">Chat</button> <br>
+                        현재상태 :  {{item2.status}} &nbsp; <br>
                         </ion-card-content>
                       </p>
                     </ion-card  >

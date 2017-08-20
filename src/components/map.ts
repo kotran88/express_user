@@ -91,7 +91,9 @@ export class MapDirective implements OnInit,OnChanges  {
 .handleNotificationOpened((jsonData)=> {
     let value=jsonData.notification.payload.additionalData
     if(value.welcome){
-        let modal = this.modal.create(NotifiedPage,{name:value.name});
+
+        // "id":this.userId,"foto":this.foto,"time": todaywithTime,"distance":distance
+        let modal = this.modal.create(NotifiedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime,distance:value.distance});
         let me = this;
         modal.onDidDismiss(data => {
             this.fetchingExpress=true;
@@ -104,6 +106,13 @@ export class MapDirective implements OnInit,OnChanges  {
 })
 .endInit();
     }else{
+
+        let modal = this.modal.create(NotifiedPage,{id:"id", name:"name",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png",time:"2017/08/17",distance:"27"});
+        let me = this;
+        modal.onDidDismiss(data => {
+            this.fetchingExpress=true;
+        });
+        modal.present();
         // let modal = this.modal.create(NotifiedPage);
         // let me = this;
         // modal.onDidDismiss(data => {
@@ -384,13 +393,8 @@ centerLocation(location){
       loading.dismiss();
     }).catch((error =>{
         //position error 발생시 다시 위치 추척
-      this.geo.getCurrentPosition(options).then(resp=>{
-      let lat=resp.coords.latitude;
-      let lng=resp.coords.longitude;
-      let location=new google.maps.LatLng(lat,lng);
-      this.map.panTo(location);
-      loading.dismiss()
-        })
+      console.log("error ! : "+error)
+      loading.dismiss();
     }))
     
     })

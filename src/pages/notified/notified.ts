@@ -12,17 +12,29 @@ import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angul
   templateUrl: 'notified.html',
 })
 export class NotifiedPage {
-  value:any;
+  id:any;
+  time:any;
+  distance:any;
+  foto:any;
+
   constructor(public navCtrl: NavController,public viewCtrl:ViewController, public navParams: NavParams) {
   }
 
   ionViewWillEnter() {
-    this.value = this.navParams.get('name');
-    if(this.value==undefined||this.value==null){
-      this.value="haha"
+    this.id = this.navParams.get('id');
+    this.time=this.navParams.get("time")
+    this.distance=this.navParams.get("distance")
+    this.foto=this.navParams.get("foto")
+    if(this.id==undefined||this.id==null){
+      this.id="haha"
     }
   }
-
+  confirm(){
+    this.viewCtrl.dismiss();
+  }
+  log(value){
+    console.log(value)
+  }
   goBack(){
       this.viewCtrl.dismiss();
   }

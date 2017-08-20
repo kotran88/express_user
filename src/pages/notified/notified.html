@@ -17,7 +17,21 @@
 
 
 <ion-content class="main-view" padding>
+    
   <div class="modal_content">
-    배달자 이름 : {{value}}
+      <!-- <ion-rating (ionClick)="log($event)"> </ion-rating> -->
+      <div class="header">배달원 지정 안내</div>
+      <div class="content">
+        <div class="image">
+          <img src="{{foto}}"/>
+        </div>
+        <div class="info">
+            배달자 ID : {{id}}<br>
+            배달자 이름 : {{name}}<br>
+            거리 : {{distance}}<br>
+        </div> 
+      </div>
+    <button class="confirm" ion-button (click)="confirm()">확인</button>
+   
   </div>
 </ion-content>

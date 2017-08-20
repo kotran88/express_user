@@ -38,6 +38,7 @@ import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@ionic-nativ
 
 import {AutocompletePage} from '../pages/start/autocomplete';
 import { MetroServiceProvider } from '../providers/metro-service/metro-service';
+import { IonRatingComponent } from '../components/ion-rating/ion-rating';
 
   var firebaseConfig = {
      apiKey: "AIzaSyDA8QXihUwFwPuvN2N3Tx44AQQt20wwskk",
@@ -65,7 +66,9 @@ import { MetroServiceProvider } from '../providers/metro-service/metro-service';
     ViewRequestListPage,
     ViewRequestedAllPage,
     NotifiedPage,
-    ChatPage
+    ChatPage,
+    IonRatingComponent
+    
 
   ],
   imports: [
