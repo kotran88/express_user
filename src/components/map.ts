@@ -1,5 +1,6 @@
 import { SimulateProvider } from './../providers/simulate/simulate';
 import { NotifiedPage } from './../pages/notified/notified';
+import { FinishedPage } from './../pages/finished/finished';
 import { HomePage } from './../pages/home/home';
 import { Http,Headers ,RequestOptions} from '@angular/http';
 import { request } from './models/request';
@@ -99,7 +100,11 @@ export class MapDirective implements OnInit,OnChanges  {
                 });
                 modal.present();
             }else if (value.welcome=="finished"){
-
+                let modal = this.modal.create(FinishedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime});
+                let me = this;
+                modal.onDidDismiss(data => {
+                });
+                modal.present();
             } else{
                 alert("nope");
             }
@@ -110,10 +115,10 @@ export class MapDirective implements OnInit,OnChanges  {
         
     }else{
 
-        let modal = this.modal.create(NotifiedPage,{id:"id", name:"name",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png",time:"2017/08/17",distance:"27"});
+        let modal = this.modal.create(FinishedPage,{id:"id", name:"name",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png",time:"2017/08/17"});
         let me = this;
         modal.onDidDismiss(data => {
-            this.fetchingExpress=true;
+            alert("end")
         });
         modal.present();
         // let modal = this.modal.create(NotifiedPage);

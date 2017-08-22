@@ -35,7 +35,7 @@ import {Keyboard} from '@ionic-native/keyboard';
 import { Dialogs } from '@ionic-native/dialogs';
 import { OneSignal } from '@ionic-native/onesignal';
 import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@ionic-native/background-geolocation';
-
+import { FinishedPage} from '../pages/finished/finished';
 import {AutocompletePage} from '../pages/start/autocomplete';
 import { MetroServiceProvider } from '../providers/metro-service/metro-service';
 import { IonRatingComponent } from '../components/ion-rating/ion-rating';
@@ -67,7 +67,8 @@ import { IonRatingComponent } from '../components/ion-rating/ion-rating';
     ViewRequestedAllPage,
     NotifiedPage,
     ChatPage,
-    IonRatingComponent
+    IonRatingComponent,
+    FinishedPage
     
 
   ],
@@ -96,7 +97,8 @@ import { IonRatingComponent } from '../components/ion-rating/ion-rating';
     ViewRequestListPage,
     ViewRequestedAllPage,
     NotifiedPage,
-    ChatPage
+    ChatPage,
+    FinishedPage
     
     
   ],
