@@ -24,10 +24,12 @@
             <ion-item  >
                     <ion-card  *ngFor="let item2 of result" >
                       <p *ngIf="item === item2.onlyDate">
-                        <ion-card-header>
+                        <ion-card-header style="text-align:center">
                         오더번호 : {{item2.orderNo}}
-                        <button *ngIf="item2.status=='assigned'" style="float:right" class="chat" ion-button (click)="chat(item2)">Chat</button> 
-                        
+                        <div class="custom" style="margin-top:5px">
+                          <button *ngIf="item2.status=='assigned'" style="float:left" class="chat" ion-button (click)="chat(item2)">Chat</button> 
+                          <button *ngIf="item2.status=='assigned'" style="float:right" class="chat" ion-button (click)="confirm(item2)">배송완료</button> 
+                        </div>
                         </ion-card-header>
                          <ion-card-content>
                         출발역:  {{item2.startPoint}} &nbsp; &nbsp; <br>

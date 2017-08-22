@@ -29,9 +29,5 @@ export class CarProvider {
       this.simulate.getCars(lat,lng))
       .share();
   }
-  findPickupCar(pickupLocation){
-    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    console.log(pickupLocation+"findPcikup");
-    return this.simulate.findPickupCar(pickupLocation);
-  }
+  
 }

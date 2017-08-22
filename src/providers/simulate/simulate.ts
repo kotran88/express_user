@@ -27,29 +27,19 @@ export class SimulateProvider {
     this.directionsService=new google.maps.DirectionsService();
     this.items = this.afd.list('/employees_status/Available/', { preserveSnapshot: true });
     console.log('Hello SimulateProvider Provider');
-    console.log(this.items);
-    console.log("this.item");
-    console.log(this.cars[0].cars[0].coord);
     this.items.subscribe(snapshots=>{
-        console.log("snapshot!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        console.log(snapshots);
         snapshots.forEach(element => {
-          console.log(element.key);
-          console.log(element.val());
+
+          //특정유저로 한정시킨다. (여기서는 배송자 한사람에 대해서만 보여주면 되기에 한명으로 한정함. )
           if(element.val().userid=="kotraner"){
             this.activeUserLocation.push(element.val());
-            console.log("sssssss"+this.activeUserLocation);
-            console.log(this.activeUserLocation);
           }
+          
           
         });
     })
-      console.log(this.activeUserLocation);
-      console.log(this.activeUserLocation.length);
       for (var i=0; i<this.activeUserLocation.length; i++){
-        console.log("i:"+i+",,,"+this.activeUserLocation.lat);
       }
-      console.log("this.active");
 
   }
  
@@ -118,64 +108,7 @@ export class SimulateProvider {
       })
     })
   }
-  getSegmentedDirections(directions){
-    let route=directions.routes[0];
-    let legs=route.legs;
-    let path=[];
-    let increments=[];
-    let duration=0;
-
-    let numOfLegs=legs.length;
-    while(numOfLegs--){
-      let leg=legs[numOfLegs];
-      let steps=leg.steps;
-      let numOfSteps=steps.length;
-      while(numOfSteps--){
-        let step=steps[numOfSteps];
-        let points=step.path;
-        let numOfPoints=points.length;
-
-        duration+=step.duration.value;
-        while(numOfPoints--){
-          let point =points[numOfPoints];   
-          path.push(point);
-          increments.unshift({
-            position:point,  //car position
-            time:duration,  //time elft before arrival
-            path:path.slice(0)  //clone array to prevent referencing final path array
-          })
-
-
-        }
-      }
-    }
-
-    return increments;
-  }
-  simulateRoute(start,end){
-    console.log("simulateRoute"+start+","+end);
-    return Observable.create(observable=>{
-      this.calculateRoute(start,end).subscribe(directions=>{
-        //get route path
-        this.myRoute=this.getSegmentedDirections(directions);
-        this.getPickupCar().subscribe(car=>{
-          observable.next(car);
-        })
-
-
-        //return pickup car
-      })
-    })
-  }
-  findPickupCar(pickupLocation){
-
-    this.myRouteIndex=0;
-    let car=this.cars1.cars[0];
-    let start=new google.maps.LatLng(car.coord.lat,car.coord.lng);
-    let end=pickupLocation;
-
-    return this.simulateRoute(start,end);
-  }
+  
   getPickupCar(){
     return Observable.create(observable=>{
       let car=this.myRoute[this.myRouteIndex];

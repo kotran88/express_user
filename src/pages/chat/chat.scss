@@ -22,9 +22,8 @@ page-chat {
         margin: 40px 0 0;
     }
     .enter{
-        bottom:2.6rem;
         color:#000;
-        width:15%;
+        width:14%;
         background-color:transparent;
     }
     .round.hollow a {
@@ -98,6 +97,7 @@ page-chat {
         padding: 5px !important;
          border: medium none;
         width: 80% !important;
+        float:left;
     }
     .popup-messages-footer {
         background: #fff none repeat scroll 0 0;
@@ -266,9 +266,24 @@ page-chat {
          display: inline;
           z-index: -2;
     }
+    .popup-messages .doted-border2::after {
+       
+    }
     
     .popup-messages .direct-chat-msg::after {
         background: #fff none repeat scroll 0 0;
+        border-right: medium none;
+        bottom: 0;
+        content: "";
+        left: 17px;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        width: 2px;
+         display: inline;
+          z-index: -2;
+    }
+    .popup-messages .direct-chat-msg2::after {
         border-right: medium none;
         bottom: 0;
         content: "";

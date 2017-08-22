@@ -26,6 +26,7 @@ export class ChatPage {
   contents:string;
   chat={} as Chatting
   userId:string;
+  uid:string;
   ionViewWillEnter():void{
   //  this.scrollToBottom();
   }
@@ -41,9 +42,10 @@ export class ChatPage {
     }else{
     this.userId="admin"
     }
+
     this.item=this.navParams.get("item");
-    this.deliveryGuy=this.item.user;
-    this.deliveryGuy="kotran"
+    this.uid=this.item.uid;
+    this.deliveryGuy=this.item.deliveryGuy;
 
     this.chatContent=this.afDatabase.list('message/'+this.item.orderNo, { preserveSnapshot: true })
     
@@ -70,26 +72,14 @@ export class ChatPage {
     })
     })
 
-    this.items=this.afDatabase.list('profile/', { preserveSnapshot: true })
+    this.items=this.afDatabase.list('profile/'+this.uid, { preserveSnapshot: true })
     this.items.subscribe(snapshots=>{
       snapshots.forEach(element => {
         console.log("element")
-
-        var keysFiltered = Object.keys(element.val()).filter(function(item){return !( element.val()[item] == undefined)});
-        
-       var valuesFiltered = keysFiltered.map((item)=> {
-           console.log(item);
-           console.log(element.val()[item]);
-           if(item=="id"){
-            if(element.val()[item]==this.deliveryGuy){
-              this.image=element.val()["foto"]
-            }else{
-              
-            }
-           }
-           
-        
-       });
+        if(element.key==="foto"){
+          this.image=element.val();
+        }
+       
       
 
       });

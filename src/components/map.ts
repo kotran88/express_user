@@ -85,26 +85,29 @@ export class MapDirective implements OnInit,OnChanges  {
      
     if(this.platform.is('android')){
 
-
         window["plugins"].OneSignal
-.startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
-.handleNotificationOpened((jsonData)=> {
-    let value=jsonData.notification.payload.additionalData
-    if(value.welcome){
+        .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
+        .handleNotificationOpened((jsonData)=> {
+            let value=jsonData.notification.payload.additionalData
+            if(value.welcome=="assigned"){
+        
+                // "id":this.userId,"foto":this.foto,"time": todaywithTime,"distance":distance
+                let modal = this.modal.create(NotifiedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime,distance:value.distance});
+                let me = this;
+                modal.onDidDismiss(data => {
+                    this.fetchingExpress=true;
+                });
+                modal.present();
+            }else if (value.welcome=="finished"){
 
-        // "id":this.userId,"foto":this.foto,"time": todaywithTime,"distance":distance
-        let modal = this.modal.create(NotifiedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime,distance:value.distance});
-        let me = this;
-        modal.onDidDismiss(data => {
-            this.fetchingExpress=true;
-        });
-        modal.present();
-    }else{
-        alert("nope");
-    }
-
-})
-.endInit();
+            } else{
+                alert("nope");
+            }
+        
+        })
+        .endInit();
+        
+        
     }else{
 
         let modal = this.modal.create(NotifiedPage,{id:"id", name:"name",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png",time:"2017/08/17",distance:"27"});
@@ -276,8 +279,7 @@ centerLocation(location){
     let request = {
               latLng: {lat:lat,lng:lng}
             };  
-            if(this.count<3){
-                alert("getgeocoding")
+            if(this.count<10){
         this.geocoder=new google.maps.Geocoder();
         this.geocoder.geocode(request,  (results, status) => {
                     if (status == google.maps.GeocoderStatus.OK) {

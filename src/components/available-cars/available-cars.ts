@@ -21,12 +21,13 @@ export class AvailbleCarDirective implements OnInit,OnChanges  {
     }
     ngOnChanges() {
         if(this.fetchingExpress){
-            this.fetchAndRefreshCars();
+            
         }
     }
     constructor(public carService:CarProvider, private dialog:Dialogs,public afDatabase:AngularFireDatabase){
         this.carMarkers=[];
         console.log("AvailbleCarDirective")
+        this.fetchAndRefreshCars();
         //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
         //Add 'implements OnInit' to the class.
     }
@@ -37,7 +38,7 @@ export class AvailbleCarDirective implements OnInit,OnChanges  {
         var numofCars=this.carMarkers.length;
         for(var i=0; i<this.carMarkers.length; i++){
             
-            if(car.isactive=="false"){
+            if(car.isactive=="false"||car.isactive==undefined){
                 console.log("isactive 가 false 임"+car.id+","+this.carMarkers[i].id);
                 if(car.id==this.carMarkers[i].id){
                     this.carMarkers[i].set('isactive',car.isactive);
@@ -58,7 +59,7 @@ export class AvailbleCarDirective implements OnInit,OnChanges  {
             
         }
         console.log(this.carMarkers);
-        console.log("??"+this.carMarkers.length+","+numOfCars);
+        console.log("??!!"+this.carMarkers.length+","+numOfCars);
         for(var i=0,numOfCars=this.carMarkers.length;  i < numofCars; i++){
             
             if(this.carMarkers[i].id===car.id){
@@ -85,7 +86,7 @@ export class AvailbleCarDirective implements OnInit,OnChanges  {
         let carMarker=new google.maps.Marker({
             map:this.map,
             position : new google.maps.LatLng(car.coord.lat,car.coord.lng),
-            icon : 'assets/icon/map-marker.png'
+            icon : 'assets/icon/start2.png'
         })
       
         carMarker.set('lat',car.coord.lat);

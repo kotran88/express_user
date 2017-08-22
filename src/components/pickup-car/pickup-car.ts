@@ -64,14 +64,14 @@ export class PickupCar {
         })
     }
     requestCar(){
-        console.log('request car '+this.pickupLocation);
-        this.carService.findPickupCar(this.pickupLocation)
-        .subscribe(car=>{
-            this.addCarMarker(car.position);
-            this.showDirection(car.path);
-            //show car marker and path keep updating car
-            this.updateCar();
-        })
+        // console.log('request car '+this.pickupLocation);
+        // this.carService.findPickupCar(this.pickupLocation)
+        // .subscribe(car=>{
+        //     this.addCarMarker(car.position);
+        //     this.showDirection(car.path);
+        //     //show car marker and path keep updating car
+        //     this.updateCar();
+        // })
         //this.carService.findPickupCar(this.pickupLocation)
     }
     removeCar(){

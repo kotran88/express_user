@@ -66,6 +66,7 @@ export class HomePage implements OnInit,OnChanges  {
   firestore=firebase.database().ref('/pushtokens');
   firemsg=firebase.database().ref('/messages');
   result_metro:any;
+  totalNumber:number=0;
   public watch: any;    
   public lat: number = 0;
   public lng: number = 0;
@@ -103,16 +104,7 @@ export class HomePage implements OnInit,OnChanges  {
       this.result_metro=data;
     });
     
-    if(this.platform.is('android')){
-       window["plugins"].OneSignal
-                        .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
-                        .handleNotificationOpened(notificationOpenedCallback)
-                        .endInit();
-                         var notificationOpenedCallback = function(jsonData) {
-                           alert("sss")
-        alert(JSON.stringify(jsonData))
-    };
-    }
+
    
     
  this.items=this.afDatabase.list('/requestedList/requested', { preserveSnapshot: true })
@@ -277,37 +269,30 @@ var distance = google.maps.geometry.spherical.computeDistanceBetween(new google.
         this.request.startLat=this.startLat;
         this.request.startLng=this.startLng;
       }
-        
-        
-      
-      
       this.request.onlyDate=todayNoTime2;
-      var orderNo=yyyy+month+day+'0000'+this.totalOrder.length;
+        
+      this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
+      this.it.subscribe(snapshots=>{
+        this.totalNumber=snapshots.length;
+       
+      })
+      
+      
+      var orderNo=yyyy+month+day+'0000'+this.totalNumber;
       this.request.orderNo=orderNo;
       this.requested=true;
       if(this.platform.is('android')){
           window["plugins"].OneSignal.getIds((idx)=>{
            this.request.tokenId=idx.userId
-           this.afDatabase.object('/requestedList/requestedAll/'+todayNoTime+'/'+orderNo).set(this.request).then((suc)=>{
+           this.afDatabase.object('/requestedList/requestedAll/'+orderNo).set(this.request).then((suc)=>{
           }).catch((error)=>{
             alert(error)
           })
-          this.afDatabase.object('/requestedList/requested/'+todayNoTime+'/'+orderNo).set(this.request).then((success)=>{
+          this.afDatabase.object('/requestedList/requested/'+orderNo).set(this.request).then((success)=>{
            this.totalOrder=[];
            alert("입력성공")
            
-           this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
-          this.it.subscribe(snapshots=>{
-            snapshots.forEach(element => {
-              
-               var keysFiltered = Object.keys(element.val()).filter(function(item){return !( element.val()[item] == undefined)});
-         
-       var valuesFiltered = keysFiltered.map((item)=> {
-             this.totalOrder.push(item);
-             
-            });
-          })
-          })
+           
            this.afAuth.authState.subscribe(auth=>{
           if(auth!=null||auth!=undefined){
           this.afDatabase.list('/profile/'+auth.uid+'/request').push(this.request).then((success)=>{
