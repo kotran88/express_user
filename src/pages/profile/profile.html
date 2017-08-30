@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>profile</ion-title>
+    <ion-title>고객용 프로필 정보 입력</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -20,9 +20,23 @@
   
   <ng-template #other>사용 가능입니다.</ng-template>
   <ion-item>
-    <ion-label floating>USER ID</ion-label>
+    <ion-label floating>사용하실 ID를 입력해주세요.</ion-label>
     <ion-input [(ngModel)]="profile.id"></ion-input>
     
   </ion-item>
-   <button ion-button clear block (click)="createProfile()"> 다음 </button>
+
+  <div id="sign-in-button" class="sign-in-button"></div>
+  <div *ngIf="windowRef.confirmationResult">
+    <label for="code"> enter code here</label>
+    <input type="text" name="code" [(ngModel)]="verificationCode">
+    <button (click)="verifyLoginCode()"> Verify </button>
+  </div>
+  <div class="phonecheck">
+    <input type="text" name="pre" [(ngModel)]="pre">
+    <input type="text" name="line" [(ngModel)]="line">
+    <input type="text" name="line2" [(ngModel)]="line2">
+  </div>
+    <button ion-button clear block (click)="checkPhone()">폰 체크</button>
+
+   <button ion-button clear block (click)="createProfile()"> 가입완료 </button>
 </ion-content>

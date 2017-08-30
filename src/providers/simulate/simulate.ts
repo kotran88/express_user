@@ -33,6 +33,8 @@ export class SimulateProvider {
           //특정유저로 한정시킨다. (여기서는 배송자 한사람에 대해서만 보여주면 되기에 한명으로 한정함. )
           if(element.val().userid=="kotraner"){
             this.activeUserLocation.push(element.val());
+            console.log("pushed");
+            console.log(element.val());
           }
           
           
@@ -54,9 +56,10 @@ export class SimulateProvider {
     console.log(carData.cars[0]);
     console.log(carData.cars[0].coord.lat+",,,,"+carData.cars[0].coord.lng);
     console.log(this.activeUserLocation.length);
+    console.log("sssasdasda");
+    console.log(this.activeUserLocation)
     console.log(this.cars_array.length);
     if(this.activeUserLocation.length>0){
-      console.log("sssasdasda");
       this.cars_array=[];
       console.log(this.activeUserLocation.length);
       console.log(this.activeUserLocation[0].lat+"!!!!!"+this.activeUserLocation[0].lng);
@@ -70,8 +73,8 @@ export class SimulateProvider {
                 lng:this.activeUserLocation[i].lng
               },
               isactive:this.activeUserLocation[i].isactive,
-              userid:this.activeUserLocation[i].userId,
-              created_date:this.activeUserLocation[i].created_date
+              userid:this.activeUserLocation[i].userid,
+              created_date:this.activeUserLocation[i].create_date
             })
             // carData.cars[i].coord.lat=this.activeUserLocation[i].lat;
             // carData.cars[i].coord.lng=this.activeUserLocation[i].lng;

@@ -3,4 +3,8 @@ export interface Profile_User{
     foto:string;
     created_date:string;
     first:boolean;
+    notiId:string;
+    uid:string;
+    phone:string;
+    name:string;
 }

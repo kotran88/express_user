@@ -26,7 +26,7 @@ export class NotifiedPage {
     this.distance=this.navParams.get("distance")
     this.foto=this.navParams.get("foto")
     if(this.id==undefined||this.id==null){
-      this.id="haha"
+      this.id="test Id "
     }
   }
   confirm(){

@@ -1,5 +1,4 @@
 import { GooglePlus } from '@ionic-native/google-plus';
-import { MetroServiceProvider } from './../../providers/metro-service/metro-service';
 import { ViewRequestListPage } from './../view-request-list/view-request-list';
 import { ViewRequestedAllPage } from './../view-requested-all/view-requested-all';
 import { request } from './../../components/models/request';
@@ -16,12 +15,12 @@ import { Component, OnInit, OnChanges, Input } from '@angular/core';
 import { NavController, LoadingController, NavParams, ModalController, Platform } from 'ionic-angular';
 import {Keyboard} from '@ionic-native/keyboard';
 import firebase from 'firebase';
-import {AutocompletePage} from './../start/autocomplete';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { OneSignal } from '@ionic-native/onesignal';
 import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@ionic-native/background-geolocation';
 
 import { Geolocation } from '@ionic-native/geolocation';
+import { RequestModalPage} from './../request-modal/request-modal';
 
 declare var google;
 @Component({
@@ -71,38 +70,31 @@ export class HomePage implements OnInit,OnChanges  {
   public lat: number = 0;
   public lng: number = 0;
   totalOrder=[];
+  phone:string;
   imageUrl:string;
+  uid:string;
   constructor(public m : MapDirective, public navCtrl: NavController,public navParam:NavParams ,public mapDirective:MapDirective, public modalCtrl:ModalController, public loading:LoadingController, public fb:FirebaseService, 
     private geo:Geolocation,private afDatabase:AngularFireDatabase,public afAuth : AngularFireAuth,private googleplus:GooglePlus
-  ,public metro: MetroServiceProvider,private oneSignal: OneSignal, public platform:Platform,private backgroundGeolocation: BackgroundGeolocation,public http:Http) {
+  ,private oneSignal: OneSignal, public platform:Platform,private backgroundGeolocation: BackgroundGeolocation,public http:Http) {
     var id=localStorage.getItem("id");
+    this.uid=localStorage.getItem("uid");
+    this.phone=localStorage.getItem("phone");
     this.imageUrl=localStorage.getItem("foto");
     if(id!=undefined||id!=null){
     this.userId=id;
     }else{
     this.userId="admin"
     }
+    if(this.uid==""||this.uid==undefined){
+      this.uid="JIKHzr0ihwOxebqUciSr7VLdhnx2"
+    }
 
     if(this.imageUrl==undefined){
       this.imageUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png"
     }
      
-    this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
-       this.it.subscribe(snapshots=>{
-         snapshots.forEach(element => {
-           
-            var keysFiltered = Object.keys(element.val()).filter(function(item){return !( element.val()[item] == undefined)});
-      
-    var valuesFiltered = keysFiltered.map((item)=> {
-          this.totalOrder.push(item);
-          
-         });
-       })
-       })
-
-    var result_metro=this.metro.getMetro().subscribe(data=>{
-      this.result_metro=data;
-    });
+   
+    
     
 
    
@@ -138,6 +130,7 @@ export class HomePage implements OnInit,OnChanges  {
       if(this.platform.is("android")){
 
         this.googleplus.logout();
+        this.navCtrl.setRoot(LoginPage);
       }else{
         alert("not web")
       }
@@ -145,6 +138,7 @@ export class HomePage implements OnInit,OnChanges  {
       this.navCtrl.setRoot(page.component);
       this.activePage=page;
     }
+    
     
   }
   checkActive(page){
@@ -154,10 +148,12 @@ export class HomePage implements OnInit,OnChanges  {
      let modal = this.modalCtrl.create(EndPage);
     let me = this;
     modal.onDidDismiss(data => {
+      console.log("data!!");
+      console.log(data)
       if(data!=null){
-        this.endPoint=data.endloc;
-      this.endLat=data.endlat;
-      this.endLng=data.endlng;
+        this.endPoint=data.loc;
+      this.endLat=data.lat;
+      this.endLng=data.lng;
       }
       
     });
@@ -171,14 +167,7 @@ export class HomePage implements OnInit,OnChanges  {
     modal.onDidDismiss(data => {
       if(data!=null){
         console.log("modalOn")
-        console.log(this.result_metro);
-        for(var i=0; i<this.result_metro.length; i++){
-          var distance = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(data.lat,data.lng),
-                                                                              new google.maps.LatLng(this.result_metro[i].XPOINT_WGS, this.result_metro[i].YPOINT_WGS));       
-          distance=distance/1000;
-          distance=distance.toFixed(2);
-          console.log(this.result_metro[i].STATION_NM+","+distance)
-        }
+       
         this.startPoint=data.loc;
       this.startLat=data.lat;
       this.startLng=data.lng;
@@ -226,92 +215,103 @@ export class HomePage implements OnInit,OnChanges  {
      
         
     }else{
-      var sp=this.startPoint;
-      var ep=this.endPoint;
-      this.startPoint="";
-      this.endPoint=""
-      
-var distance = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(this.startLat, this.startLng),
- new google.maps.LatLng(this.endLat, this.endLng));       
-      distance=(parseInt(distance)/1000);
-      
-      this.request.startPoint=this.startPoint;
-      this.request.endPoint=this.endPoint;
-      let today = new Date();
-        let dd:number;
-        let day:string;
-        let month:string;
-         dd = today.getDate();
-        var mm = today.getMonth()+1; //January is 0!
-
-        var yyyy = today.getFullYear();
-       var time=new Date().toLocaleTimeString('en-US', { hour12: false,hour: "numeric",minute: "numeric"});
-       
-        dd<10?day='0'+dd:day=''+dd;
-        mm<10?month='0'+mm:month=''+mm;
-        let todayNoTime= yyyy+" "+mm+" "+dd;
-        let todayNoTime2=yyyy+'/'+month+'/'+day;
-      let todayWithTime = yyyy+'/'+month+'/'+day+' '+time;
-          let todayWithTime2 = yyyy+'/'+month+'/'+day;
-      this.request.user=this.userId
-      this.request.create_date=todayWithTime;
-      this.request.status="requested";
-      this.request.startPoint=sp;
-      this.request.endPoint=ep;
       if(this.endLat==undefined){
-        this.request.endLat=this.endLat2;
-        this.request.endLng=this.endLng2;
-        this.request.startLat=this.startLat2;
-        this.request.startLng=this.startLng2 ;
-      }else{
-        this.request.endLat=this.endLat;
-        this.request.endLng=this.endLng;
-        this.request.startLat=this.startLat;
-        this.request.startLng=this.startLng;
-      }
-      this.request.onlyDate=todayNoTime2;
-        
-      this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
-      this.it.subscribe(snapshots=>{
-        this.totalNumber=snapshots.length;
+                this.request.endLat=this.endLat2;
+                this.request.endLng=this.endLng2;
+                this.request.startLat=this.startLat2;
+                this.request.startLng=this.startLng2 ;
+              }else{
+                this.request.endLat=this.endLat;
+                this.request.endLng=this.endLng;
+                this.request.startLat=this.startLat;
+                this.request.startLng=this.startLng;
+              }
+      var distance = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(this.request.startLat, this.request.startLng),
+       new google.maps.LatLng(this.request.endLat, this.request.endLng));   
+            distance=(parseInt(distance)/1000);
+            var loc={startlat:this.request.startLat,startlng:this.request.startLng,endlat:this.request.endLat,endlng:this.request.endLng}
+      let modal = this.modalCtrl.create(RequestModalPage,{start: this.startPoint   , end: this.endPoint, dis:distance,location:loc});
+      modal.onDidDismiss(data => {
+
+      });
+      modal.present();
+//       var sp=this.startPoint;
+//       var ep=this.endPoint;
+//       this.startPoint="";
+//       this.endPoint=""
+      
+// var distance = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(this.startLat, this.startLng),
+//  new google.maps.LatLng(this.endLat, this.endLng));       
+//       distance=(parseInt(distance)/1000);
+      
+//       this.request.startPoint=this.startPoint;
+//       this.request.endPoint=this.endPoint;
+//       let today = new Date();
+//         let dd:number;
+//         let day:string;
+//         let month:string;
+//          dd = today.getDate();
+//         var mm = today.getMonth()+1; //January is 0!
+
+//         var yyyy = today.getFullYear();
+//        var time=new Date().toLocaleTimeString('en-US', { hour12: false,hour: "numeric",minute: "numeric"});
        
-      })
+//         dd<10?day='0'+dd:day=''+dd;
+//         mm<10?month='0'+mm:month=''+mm;
+//         let todayNoTime= yyyy+" "+mm+" "+dd;
+//         let todayNoTime2=yyyy+'/'+month+'/'+day;
+//       let todayWithTime = yyyy+'/'+month+'/'+day+' '+time;
+//           let todayWithTime2 = yyyy+'/'+month+'/'+day;
+//       this.request.user=this.userId
+//       this.request.create_date=todayWithTime;
+//       this.request.status="requested";
+//       this.request.startPoint=sp;
+//       this.request.endPoint=ep;
+//       if(this.endLat==undefined){
+//         this.request.endLat=this.endLat2;
+//         this.request.endLng=this.endLng2;
+//         this.request.startLat=this.startLat2;
+//         this.request.startLng=this.startLng2 ;
+//       }else{
+//         this.request.endLat=this.endLat;
+//         this.request.endLng=this.endLng;
+//         this.request.startLat=this.startLat;
+//         this.request.startLng=this.startLng;
+//       }
+//       this.request.onlyDate=todayNoTime2;
+        
+//       this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
+//       this.it.subscribe(snapshots=>{
+//         this.totalNumber=snapshots.length;
+       
+//       })
       
       
-      var orderNo=yyyy+month+day+'0000'+this.totalNumber;
-      this.request.orderNo=orderNo;
-      this.requested=true;
-      if(this.platform.is('android')){
-          window["plugins"].OneSignal.getIds((idx)=>{
-           this.request.tokenId=idx.userId
-           this.afDatabase.object('/requestedList/requestedAll/'+orderNo).set(this.request).then((suc)=>{
-          }).catch((error)=>{
-            alert(error)
-          })
-          this.afDatabase.object('/requestedList/requested/'+orderNo).set(this.request).then((success)=>{
-           this.totalOrder=[];
-           alert("입력성공")
+//       var orderNo=yyyy+month+day+'0000'+this.totalNumber;
+//       this.request.orderNo=orderNo;
+//       this.requested=true;
+//       if(this.platform.is('android')){
+//           window["plugins"].OneSignal.getIds((idx)=>{
+//            this.request.tokenId=idx.userId
+//            this.afDatabase.object('/requestedList/requestedAll/'+orderNo).set(this.request).then((suc)=>{
+//           }).catch((error)=>{
+//             alert(error)
+//           })
+//           this.afDatabase.object('/requestedList/requested/'+orderNo).set(this.request).then((success)=>{
+//            this.totalOrder=[];
+//            alert("입력성공")
            
            
-           this.afAuth.authState.subscribe(auth=>{
-          if(auth!=null||auth!=undefined){
-          this.afDatabase.list('/profile/'+auth.uid+'/request').push(this.request).then((success)=>{
-            
-         }).catch((error)=>{
-             alert(error);
-           })
-           }
            
-         })
-       }).catch((error)=>{
-         alert(error);
-       })
-        })
-        }else{
-          console.log("this.request");
-          console.log(this.request);
+//        }).catch((error)=>{
+//          alert(error);
+//        })
+//         })
+//         }else{
+//           console.log("this.request");
+//           console.log(this.request);
           
-        }
+//         }
   
        
        

@@ -85,12 +85,11 @@ export class MapDirective implements OnInit,OnChanges  {
    
      
     if(this.platform.is('android')){
-
         window["plugins"].OneSignal
         .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
         .handleNotificationOpened((jsonData)=> {
             let value=jsonData.notification.payload.additionalData
-            if(value.welcome=="assigned"){
+            if(value.status=="assigned"){
         
                 // "id":this.userId,"foto":this.foto,"time": todaywithTime,"distance":distance
                 let modal = this.modal.create(NotifiedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime,distance:value.distance});
@@ -99,8 +98,8 @@ export class MapDirective implements OnInit,OnChanges  {
                     this.fetchingExpress=true;
                 });
                 modal.present();
-            }else if (value.welcome=="finished"){
-                let modal = this.modal.create(FinishedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime});
+            }else if (value.status=="finished"){
+                let modal = this.modal.create(FinishedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime,itemObject:value.itemObject});
                 let me = this;
                 modal.onDidDismiss(data => {
                 });
@@ -115,12 +114,15 @@ export class MapDirective implements OnInit,OnChanges  {
         
     }else{
 
-        let modal = this.modal.create(FinishedPage,{id:"id", name:"name",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png",time:"2017/08/17"});
-        let me = this;
-        modal.onDidDismiss(data => {
-            alert("end")
-        });
-        modal.present();
+        //window 일 경우. 
+        
+
+        // let modal = this.modal.create(FinishedPage,{id:"id", name:"name",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png",time:"2017/08/17"});
+        // let me = this;
+        // modal.onDidDismiss(data => {
+        //     alert("end")
+        // });
+        // modal.present();
         // let modal = this.modal.create(NotifiedPage);
         // let me = this;
         // modal.onDidDismiss(data => {
@@ -388,7 +390,7 @@ centerLocation(location){
     })
     loading.present().then(()=>{
     })
-    let options={timeout:5000,maximumAge :5000,enableHighAccuracy:true}
+    let options={timeout:15000,maximumAge :5000,enableHighAccuracy:true}
     let locationObs=Observable.create(observable =>{
       this.geo.getCurrentPosition(options).then(resp=>{
       let lat=resp.coords.latitude;

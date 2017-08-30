@@ -6,7 +6,7 @@ import { User } from './../../components/models/user';
 import { SignupPage } from './../signup/signup';
 import { HomePage } from './../../pages/home/home';
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, LoadingController,NavController, NavParams, ToastController } from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { AngularFireModule} from 'angularfire2';
 import firebase from 'firebase';
@@ -32,11 +32,11 @@ export class LoginPage implements OnInit {
   phoneNumber = new PhoneNumber()
   checked:boolean=false;
   verificationCode: string;
-
+  tokenId:string;
   users: any;
-    requestToken:any;
-  constructor(public toast:ToastController, public afAuth : AngularFireAuth,public afDatabase:AngularFireDatabase, public navCtrl: NavController,public googleplus:GooglePlus,public afauth:AngularFireAuth,public afd:AngularFireDatabase) {
-  
+  requestToken:any;
+  count:number=0;
+  constructor(public loading:LoadingController,public toast:ToastController, public afAuth : AngularFireAuth,public afDatabase:AngularFireDatabase, public navCtrl: NavController,public googleplus:GooglePlus,public afauth:AngularFireAuth,public afd:AngularFireDatabase) {
    
 
   }
@@ -104,80 +104,84 @@ export class LoginPage implements OnInit {
     }
     }
   googleLogin(){
+    let loading=this.loading.create({
+      content:'Loading...'
+    })
+    loading.present().then(()=>{
+    })
 
+
+    window["plugins"].OneSignal
+    .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
     
+    .endInit();
+    window["plugins"].OneSignal.getIds((idx)=>{
+      this.tokenId=idx.userId
+    })
     this.googleplus.login({
       'webClientId':'916589339698-n71c3mmpsclus88rk6fp99la7sh0vnga.apps.googleusercontent.com'
     }).then((res)=>{
+      
       firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(res.idToken)).then(
         suc=>{
-
           this.afAuth.authState.subscribe(auth=>{
+            loading.dismiss();
+            localStorage.setItem("uid",auth.uid);
+            localStorage.setItem("tokenId",this.tokenId);
             var count=0;
-            localStorage.setItem("id", res.email.split("@")[0]);
+            localStorage.setItem("email", res.email.split("@")[0]);
             localStorage.setItem("foto",res.imageUrl);
             this.items=this.afDatabase.list('profile/'+auth.uid, { preserveSnapshot: true })
             this.items.subscribe(snapshots=>{
+              
               if(snapshots.length==0){
                 this.profile.first=false;
                 this.profile.id="null";
                 this.profile.created_date="null";
                 this.profile.foto="null";
+                this.profile.notiId="";
+                this.profile.uid="";
                 this.afDatabase.object('profile/'+auth.uid+'/').set(this.profile)
-                .then(() => {  this.navCtrl.setRoot(ProfilePage);   } ).catch((error)=> alert("err : "+error))
+                .then(() => {  this.navCtrl.setRoot(ProfilePage,{uid:auth.uid,tokenId:this.tokenId});   } ).catch((error)=> alert("err : "+error))
               }else{
-                if(snapshots.forEach(element=>{
-                  if(element.key=="first"){
-                    count++;
-                    if(element.val()==true){
-
-                      if(count==1){
-                        let toast = this.toast.create({
-                          message: '로그인되었습니다.',
-                          duration: 1000,
-                          position: 'middle'
-                        });
-                      
-                        toast.onDidDismiss(() => {
-                          this.navCtrl.setRoot(HomePage);
-                        });
-                      
-                        toast.present();
-                        
-                      }
+                snapshots.forEach(ele=>{
+                  if(ele.key=="id"){
+                    if(ele.val()=="null"){
+                      this.checked=true;
+                      this.navCtrl.setRoot(ProfilePage,{uid:auth.uid,tokenId:this.tokenId})
                     }else{
-                      if(count==1){
-
-                        this.navCtrl.setRoot(ProfilePage);
-                      }else{
-                        alert("goto home")
-                        this.navCtrl.setRoot(HomePage)
-                      }
+                      this.checked=false;
+                      localStorage.setItem("id",ele.val())
                     }
-                    
                   }
-                }))
-                if(this.checked){
-                 
+
+                  if(ele.key=="phone"){
+                    
+      
+                        
+                      localStorage.setItem("phone",ele.val())
+                  }
                   
+
+                })
+                if(this.checked){
+
                 }else{
-                
+                  if(localStorage.getItem("firstLogin")=="false"){
+                    this.navCtrl.setRoot(HomePage);
+                  }else{
+  
+                    this.navCtrl.setRoot(ProfilePage,{uid:auth.uid,tokenId:this.tokenId})
+                  }
                 }
                 
               }
+            })
           })
-            
-            
-          })
-          
-          
-        }).catch(ns=>{
-          alert("fail"+ns);
         })
-    }).catch((error =>{
-      alert(error);
-    }))
-  }
+      })
+    }
+            
 
   
 }

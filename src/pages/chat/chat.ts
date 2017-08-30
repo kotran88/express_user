@@ -44,6 +44,7 @@ export class ChatPage {
     }
 
     this.item=this.navParams.get("item");
+  
     this.uid=this.item.uid;
     this.deliveryGuy=this.item.deliveryGuy;
 

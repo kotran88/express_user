@@ -7,6 +7,7 @@ import { StartPage } from './../pages/start/start';
 import { SignupPage } from './../pages/signup/signup';
 import { ProfilePage } from './../pages/profile/profile';
 import { LoginPage } from './../pages/login/login';
+import {RequestModalPage} from './../pages/request-modal/request-modal';
 import { HttpModule } from '@angular/http';
 import { PickupCar } from './../components/pickup-car/pickup-car';
 import { MapDirective } from './../components/map';
@@ -36,7 +37,6 @@ import { Dialogs } from '@ionic-native/dialogs';
 import { OneSignal } from '@ionic-native/onesignal';
 import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@ionic-native/background-geolocation';
 import { FinishedPage} from '../pages/finished/finished';
-import {AutocompletePage} from '../pages/start/autocomplete';
 import { MetroServiceProvider } from '../providers/metro-service/metro-service';
 import { IonRatingComponent } from '../components/ion-rating/ion-rating';
 
@@ -61,14 +61,14 @@ import { IonRatingComponent } from '../components/ion-rating/ion-rating';
     ProfilePage,
     SignupPage,
     StartPage,
-    AutocompletePage,
     EndPage,
     ViewRequestListPage,
     ViewRequestedAllPage,
     NotifiedPage,
     ChatPage,
     IonRatingComponent,
-    FinishedPage
+    FinishedPage,
+    RequestModalPage
     
 
   ],
@@ -92,13 +92,13 @@ import { IonRatingComponent } from '../components/ion-rating/ion-rating';
     ProfilePage,
     SignupPage,
     StartPage,
-    AutocompletePage,
     EndPage,
     ViewRequestListPage,
     ViewRequestedAllPage,
     NotifiedPage,
     ChatPage,
-    FinishedPage
+    FinishedPage,
+    RequestModalPage
     
     
   ],

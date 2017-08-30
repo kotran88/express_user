@@ -4,9 +4,9 @@
       <ion-icon name="menu"></ion-icon>
     </button>
     <div class="title">
-      지하철택배(유저)
+      지하철택배
+      (유저)
     </div>
-      <ion-toggle [(ngModel)]="isToggled" style="float:right"  (ionChange)="notify()">activate</ion-toggle>
       <button class="nav" (click)="map.centerLocation()" ion-button >
           <ion-icon name="navigate" ></ion-icon>
         </button>
@@ -27,7 +27,7 @@
       <ion-col width-100> 
       <ion-list >
        <ion-item>
-        <ion-input placeholder="출발역 입력해주세요" (focus)="entered()" [(ngModel)]="startPoint" clearInput>{{startPoint}}</ion-input>
+        <ion-input placeholder="출발역 입력해주세요" (click)="entered()" [(ngModel)]="startPoint" clearInput>{{startPoint}}</ion-input>
       </ion-item>
       </ion-list>
       </ion-col>
@@ -100,6 +100,7 @@
           <div class="profile">
               <img class="img" src="{{imageUrl}}"/>
               <p>{{userId}}</p>
+              <p>{{phone}}</p>
           </div>
           
             <button menuClose ion-item *ngFor="let p of pages" [class.activeHighlight]="checkActive(p)" (click)="openPage(p)">{{p.title}}</button>

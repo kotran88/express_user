@@ -12,4 +12,11 @@ export interface request{
     orderNo:string
     onlyDate:string
     deliveryGuy:string
+    rating_content:string;
+    rating:string;
+
+    freight_weight:string;
+    freight_size:string;
+    freight_content:string;
+    request_text:string;
 }

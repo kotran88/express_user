@@ -14,6 +14,8 @@ export class AvailbleCarDirective implements OnInit,OnChanges  {
     @Input() isPickupRequested:boolean;
     @Input() map:any;
     @Input() fetchingExpress:boolean;
+
+
     public carMarkers:Array<any>;
     popup:any;
     ngOnInit() {
@@ -21,13 +23,12 @@ export class AvailbleCarDirective implements OnInit,OnChanges  {
     }
     ngOnChanges() {
         if(this.fetchingExpress){
-            
+            this.fetchAndRefreshCars();
         }
     }
     constructor(public carService:CarProvider, private dialog:Dialogs,public afDatabase:AngularFireDatabase){
         this.carMarkers=[];
         console.log("AvailbleCarDirective")
-        this.fetchAndRefreshCars();
         //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
         //Add 'implements OnInit' to the class.
     }
@@ -82,7 +83,8 @@ export class AvailbleCarDirective implements OnInit,OnChanges  {
   
     addCarMarker(car){
        
-        
+        console.log("car!!!!!!!!!!!");
+        console.log(car);
         let carMarker=new google.maps.Marker({
             map:this.map,
             position : new google.maps.LatLng(car.coord.lat,car.coord.lng),
@@ -96,17 +98,11 @@ export class AvailbleCarDirective implements OnInit,OnChanges  {
         carMarker.set('created_date',car.created_date);
         carMarker.set('isactive',car.isactive);
         let popup=new google.maps.InfoWindow({
-            content:'<p>'+car.coord.lat+'</p><h5>'+car.userid+'</h5>\n<h5>'+car.created_date+'</h5>'+'<button id="myid">신청</button>'
+            content:'<p>id:'+car.userid+'</p>'+'<p>lng:'+car.coord.lng+'</p>'
         });
         carMarker.addListener('click',()=>{
               popup.open(this.map,carMarker);
         })
-        google.maps.event.addListenerOnce(popup, 'domready', () => {
-            document.getElementById('myid').addEventListener('click', () => {
-                this.dialog.confirm("배달 신청하시겠습니까?", "확인").then((y)=>console.log("yessss"+y)).catch((n)=>console.log("nooo"+n))
-                
-            });
-        });
         this.carMarkers.push(carMarker);
         console.log("add car marker");
         console.log(this.carMarkers);
