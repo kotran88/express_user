@@ -1,10 +1,9 @@
 import { NotifiedPage } from './../pages/notified/notified';
 import { ViewRequestListPage } from './../pages/view-request-list/view-request-list';
 import { ViewRequestedAllPage } from './../pages/view-requested-all/view-requested-all';
+import { UniqueDeviceID } from '@ionic-native/unique-device-id';
 
-import { EndPage } from './../pages/end/end';
-import { StartPage } from './../pages/start/start';
-import { SignupPage } from './../pages/signup/signup';
+// import { TimeService } from './../shared/time'
 import { ProfilePage } from './../pages/profile/profile';
 import { LoginPage } from './../pages/login/login';
 import {RequestModalPage} from './../pages/request-modal/request-modal';
@@ -18,7 +17,6 @@ import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule, NavController } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
-import { FirebaseService } from '../providers/firebase-service';
 import { PickupDirective} from '../pickup/pickup';
 import { AvailbleCarDirective } from '../components/available-cars/available-cars';
 import { NativeGeocoder,NativeGeocoderReverseResult} from '@ionic-native/native-geocoder';
@@ -37,9 +35,12 @@ import { Dialogs } from '@ionic-native/dialogs';
 import { OneSignal } from '@ionic-native/onesignal';
 import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@ionic-native/background-geolocation';
 import { FinishedPage} from '../pages/finished/finished';
-import { MetroServiceProvider } from '../providers/metro-service/metro-service';
 import { IonRatingComponent } from '../components/ion-rating/ion-rating';
 
+import { StandbyPage } from './../pages/standby/standby';
+import { BigpicturePage } from './../pages/bigpicture/bigpicture'
+import { CameraselectPage } from './../pages/cameraselect/cameraselect'
+import { Camera } from '@ionic-native/camera';
   var firebaseConfig = {
      apiKey: "AIzaSyDA8QXihUwFwPuvN2N3Tx44AQQt20wwskk",
     authDomain: "ionic-173108.firebaseapp.com",
@@ -59,16 +60,17 @@ import { IonRatingComponent } from '../components/ion-rating/ion-rating';
     PickupCar,
     LoginPage,
     ProfilePage,
-    SignupPage,
-    StartPage,
-    EndPage,
     ViewRequestListPage,
     ViewRequestedAllPage,
     NotifiedPage,
     ChatPage,
     IonRatingComponent,
     FinishedPage,
-    RequestModalPage
+    RequestModalPage,
+    BigpicturePage,
+    CameraselectPage,
+    StandbyPage
+
     
 
   ],
@@ -90,15 +92,15 @@ import { IonRatingComponent } from '../components/ion-rating/ion-rating';
     PickupCar,
     LoginPage,
     ProfilePage,
-    SignupPage,
-    StartPage,
-    EndPage,
     ViewRequestListPage,
     ViewRequestedAllPage,
     NotifiedPage,
     ChatPage,
     FinishedPage,
-    RequestModalPage
+    RequestModalPage,
+    BigpicturePage,
+    CameraselectPage,
+    StandbyPage
     
     
   ],
@@ -107,15 +109,15 @@ import { IonRatingComponent } from '../components/ion-rating/ion-rating';
     BackgroundGeolocation,
     SplashScreen,
     NativeGeocoder,
+    UniqueDeviceID,
     Dialogs,
-    Geolocation,FirebaseService,
+    Geolocation,Camera,
     AngularFireModule,
     OneSignal,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     CarProvider,
     SimulateProvider,
     GooglePlus,AngularFireAuth,Keyboard,MapDirective,PickupDirective,
-    MetroServiceProvider
   ]
 })
 export class AppModule {}

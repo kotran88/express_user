@@ -7,4 +7,6 @@ export interface Profile_User{
     uid:string;
     phone:string;
     name:string;
+    email:string;
+    type:string;
 }

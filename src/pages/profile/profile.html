@@ -14,17 +14,19 @@
 
 
 <ion-content padding>
-  <button ion-button (click)="dupulicate()">중복검사</button>
-  <p *ngIf="start;else o">시작</p>
-  <ng-template #o><p *ngIf="dup;else other">중복입니다.</p></ng-template>
   
-  <ng-template #other>사용 가능입니다.</ng-template>
   <ion-item>
     <ion-label floating>사용하실 ID를 입력해주세요.</ion-label>
     <ion-input [(ngModel)]="profile.id"></ion-input>
     
   </ion-item>
+  <button ion-button (click)="dupulicate()">중복검사</button>
+  <p *ngIf="start;else o">시작</p>
+  <ng-template #o><p *ngIf="dup;else other">중복입니다.</p></ng-template>
+  
+  <ng-template #other>사용 가능입니다.</ng-template>
 
+  ss
   <div id="sign-in-button" class="sign-in-button"></div>
   <div *ngIf="windowRef.confirmationResult">
     <label for="code"> enter code here</label>

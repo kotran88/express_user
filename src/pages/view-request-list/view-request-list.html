@@ -7,11 +7,9 @@
 <ion-header>
 
     <ion-navbar>
-        <button start class="nav" (click)="goBack()" ion-button >
-          <ion-icon name="arrow-back" ></ion-icon>
-        </button>
+        
         <div class="title_title">
-          지하철택배(배달원)
+          지하철택배(유저)
         </div>
       </ion-navbar>
 
@@ -19,32 +17,87 @@
 
 
 <ion-content padding>
+    <ion-item>
+        <ion-label>상태를 선택하세요.</ion-label>
+        <ion-select (ionChange)="changed2()" [(ngModel)]="rmodel">
+          <ion-option value="pickup">픽업</ion-option>
+          <ion-option value="requested">신청완료</ion-option>
+          <ion-option value="assigned">매칭완료</ion-option>
+          <ion-option value="finished">배송완료</ion-option>
+        </ion-select>
+      </ion-item>
+    <!-- <ion-list style="margin-bottom:0px;" radio-group [(ngModel)]="viewSetting">
+        <ion-item  >
+            <ion-card [ngClass]="viewStyle_map ? 'viewStyle' : 'viewStyle-clicked'" (click)="viewPickup()">
+                <ion-card-content >
+                   픽업중
+                </ion-card-content>
+            </ion-card>
+            <ion-card [ngClass]="viewStyle_list ? 'viewStyle' : 'viewStyle-clicked'" (click)="viewRequested()" >
+                <ion-card-content >
+                   신청완료
+                </ion-card-content>
+            </ion-card>
+            <ion-card [ngClass]="viewStyle_map ? 'viewStyle' : 'viewStyle-clicked'" (click)="viewAssigned()">
+                <ion-card-content >
+                   매칭완료
+                </ion-card-content>
+            </ion-card>
+            <ion-card [ngClass]="viewStyle_map ? 'viewStyle' : 'viewStyle-clicked'" (click)="viewFinished()">
+                <ion-card-content >
+                   완료.
+                </ion-card-content>
+            </ion-card>
+        </ion-item>
+    </ion-list> -->
+    <ion-list (ionChange)="orderchanged()" radio-group [(ngModel)]="order">
+            
+              <ion-item>
+                <ion-label>오래된 순으로</ion-label>
+                <ion-radio value="old"></ion-radio>
+              </ion-item>
+            
+              <ion-item>
+                <ion-label>새 날짜부터</ion-label>
+                <ion-radio value="new"></ion-radio>
+              </ion-item>
+            
+            </ion-list>
     <ion-list>
         <p *ngFor="let item of result_date">{{item}}
             <ion-item  >
-                    <ion-card  *ngFor="let item2 of result" >
-                      <p *ngIf="item === item2.onlyDate">
-                        <ion-card-header style="text-align:center">
-                        오더번호 : {{item2.orderNo}}
-                        <div class="custom" style="margin-top:5px">
-                          <button *ngIf="item2.status=='assigned'" style="float:left" class="chat" ion-button (click)="chat(item2)">Chat</button> 
-                          <button *ngIf="item2.status=='assigned'" style="float:right" class="chat" ion-button (click)="confirm(item2)">배송완료</button> 
-                        </div>
-                        </ion-card-header>
-                         <ion-card-content>
-                        출발역:  {{item2.startPoint}} &nbsp; &nbsp; <br>
-                        도착역:  {{item2.endPoint}} &nbsp; &nbsp; <br>
-                        신청시간 {{item2.create_date}}<br>
-                        
-                        현재상태 :  {{item2.status}} &nbsp; <br>
-                        </ion-card-content>
-                      </p>
-                    </ion-card  >
+                <div class="list" *ngFor="let item2 of result">
+                        <p *ngIf="item === item2.onlyDate">
+
+                                <ion-card   >
+                                        
+                                     
+                                <ion-card-header style="text-align:center">
+                                오더번호2 : {{item2.orderNo}}
+                                <div class="custom" style="margin-top:5px">
+                                  <button *ngIf="item2.status=='assigned'" style="float:left" class="chat" ion-button (click)="chat(item2)">채팅하기</button> 
+                                </div>
+                                <div class="custom" style="margin-top:5px">
+                                    <button *ngIf="item2.status=='pickup'" style="float:left" class="chat" ion-button (click)="chat(item2)">취소</button> 
+                                  </div>
+        
+                                  <div class="custom" style="margin-top:5px">
+                                      <button *ngIf="item2.status=='finished'" style="float:left" class="chat" ion-button (click)="chat(item2)">리뷰남기기</button> 
+                                    </div>
+                                </ion-card-header>
+                                 <ion-card-content>
+                                출발역:  {{item2.startPoint}} &nbsp; &nbsp; <br>
+                                도착역:  {{item2.endPoint}} &nbsp; &nbsp; <br>
+                                신청시간 {{item2.create_date}}<br>
+                                 현재상태 :  {{item2.status}} &nbsp; <br>
+                                </ion-card-content>
+                             
+                            </ion-card  >
+                        </p>
+                </div>
+                    
                   </ion-item>
         </p>
-          
-        
-        
     </ion-list>
   
 </ion-content>

@@ -9,12 +9,13 @@ import { PickupCar } from './pickup-car/pickup-car';
 import { CarProvider } from './../providers/car/car';
 import { PickupDirective } from './../pickup/pickup';
 import { Observable } from 'rxjs/Rx';
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, OnInit,Injectable, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { NavController, LoadingController, ToastController,Platform,AlertController, ModalController, NavParams } from 'ionic-angular';
 import { AvailbleCarDirective } from './available-cars/available-cars';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Dialogs } from '@ionic-native/dialogs';
 import { OneSignal } from '@ionic-native/onesignal';
+import { Subscription } from 'rxjs/Subscription';
 
 declare var google;
 
@@ -25,6 +26,38 @@ declare var google;
      providers:[CarProvider,PickupDirective]
 })
 export class MapDirective implements OnInit,OnChanges  {
+
+  unsubscriber: Subscription = new Subscription();
+    latOnly:any;
+    lngOnly:any;
+    public simulate:SimulateProvider;
+    flag:string="startMarker";
+    centerMarker=[];
+    count_number:number=0;
+    notifyingChangevalue:boolean=false;
+    startlat:any;
+    startlng:any;
+    endlat:any;
+    endlng:any;
+    slat:any;
+    elat:any;
+    slng:any;
+    elng:any;
+    //mouseup될때 좌표저장.
+    @Input() resetEnddd:any;
+    @Input() resetStarttt:any;
+    @Input() panningToMiddle:any;
+    @Input() panningLocation:any;
+    @Input() makeMarkerInformation:any;
+    @Input() makeMarker:string;
+    @Input() resetStartt:any;
+    @Input() resetEndd:any;
+    @Input() resetStart:any;
+    @Input() resetEnd:boolean;
+    @Input() resetAll:any;
+    @Input() changeMarker:any;    
+    @Input() deliverer_location:any;
+    @Input() panTodeliveryGuy:any;
     @Input() isPickupRequested:any;
     @Input() startstn:string;
     @Input() endstn:string;
@@ -32,23 +65,36 @@ export class MapDirective implements OnInit,OnChanges  {
     @Input() startLat:any;
     @Input() endLng:any;
     @Input() endLat:any;
+    @Input() fetchingExpress:any;
+    @Input() deliveryGuy:any;
+    start_list=[];
+    end_list=[];
+    @Output() mapIsCreated : EventEmitter<any>=new EventEmitter();
+    @Output() start : EventEmitter<any>=new EventEmitter();
+    @Output() end : EventEmitter<any>=new EventEmitter();
+    @Output() count : EventEmitter<any>=new EventEmitter();
+    @Output() favorite : EventEmitter<any>=new EventEmitter();
     @Output() starting : EventEmitter<any>=new EventEmitter();
     @Output() ending : EventEmitter<any>=new EventEmitter();
-    @Output() drag_second : EventEmitter<any>=new EventEmitter();
+    @Output() dragging : EventEmitter<any>=new EventEmitter();
     @Output() startLocation : EventEmitter<any>=new EventEmitter();
     @Output() endLocation : EventEmitter<any>=new EventEmitter();
-
+    @Output() notifyingChange: EventEmitter<any>=new EventEmitter();
     @Output() sLat : EventEmitter<any>=new EventEmitter();
     @Output() sLng : EventEmitter<any>=new EventEmitter();
     @Output() eLat : EventEmitter<any>=new EventEmitter();
     @Output() eLng : EventEmitter<any>=new EventEmitter();
-    count:number=0;
-    count2:number=0;
+
+    @Output() new_address : EventEmitter<any>=new EventEmitter();
+    @Output() full_address : EventEmitter<any>=new EventEmitter();
     public refreshing:boolean=false;
     public map:any;
     public isMapIdle:boolean;
     public currentLocation:any;
     public full="";
+    favorite_information=[];
+    centerMarker_array=[];
+    circleMarker:any;
     lat:number;
     lng:number;
     tokenid:string;
@@ -62,18 +108,36 @@ export class MapDirective implements OnInit,OnChanges  {
      request={} as request
      markerEnd=[];
      geocoder:any;
-     full_address:string;
-     public fetchingExpress:boolean=false;
      start_end:boolean=false;
-     startMarker:any;
-     endMarker:any;
+     startMarker=[];
+     endMarker=[];
      userId:string;
-    constructor( public toast:ToastController, public loading:LoadingController,public platform:Platform, public http:Http, 
-        private dialog:AlertController,public pick:PickupDirective,public geo:Geolocation,
+     uid:string;
+    constructor(public sim:SimulateProvider, public toast:ToastController, public loading:LoadingController,public platform:Platform, public http:Http, 
+        private alertCtrl:AlertController,public pick:PickupDirective,public geo:Geolocation,
         public afDatabase:AngularFireDatabase,public modal:ModalController
   ){
 //      
 // 
+this.uid=localStorage.getItem("uid");
+if(this.uid==""||this.uid==undefined){
+  this.uid="evCJcw2WnGWlwUcFVk1K1kHVQzJ2"
+}
+console.log("uid : "+this.uid);
+  
+//  let headers = new Headers({ 'Authorization': 'Bearer Xw8t8tVjgtT0t--jRrsD7oFqZEq2AFBIjF9XSwoqAuYAAAFdv6Kaqg' });
+// let options = new RequestOptions({ headers: headers });
+//   this.http.get('https://kapi.kakao.com/v1/user/me', options).toPromise().then((res)=>{
+//       console.log(res.json())
+//       alert(res.json());
+//   }).catch((error)=>{
+//     alert(error);
+// })
+ 
+    // 
+var notificationOpenedCallback = function(jsonData) {
+console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+};
    
     var id=localStorage.getItem("id");
     if(id!=undefined||id!=null){
@@ -82,85 +146,42 @@ export class MapDirective implements OnInit,OnChanges  {
     this.userId="admin"
     }
      
-   
-     
-    if(this.platform.is('android')){
-        window["plugins"].OneSignal
-        .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
-        .handleNotificationOpened((jsonData)=> {
-            let value=jsonData.notification.payload.additionalData
-            if(value.status=="assigned"){
-        
-                // "id":this.userId,"foto":this.foto,"time": todaywithTime,"distance":distance
-                let modal = this.modal.create(NotifiedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime,distance:value.distance});
-                let me = this;
-                modal.onDidDismiss(data => {
-                    this.fetchingExpress=true;
-                });
-                modal.present();
-            }else if (value.status=="finished"){
-                let modal = this.modal.create(FinishedPage,{name:'a',id:value.name,foto:value.foto,time:value.todaywithTime,itemObject:value.itemObject});
-                let me = this;
-                modal.onDidDismiss(data => {
-                });
-                modal.present();
-            } else{
-                alert("nope");
-            }
-        
-        })
-        .endInit();
-        
-        
-    }else{
-
-        //window 일 경우. 
-        
-
-        // let modal = this.modal.create(FinishedPage,{id:"id", name:"name",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png",time:"2017/08/17"});
-        // let me = this;
-        // modal.onDidDismiss(data => {
-        //     alert("end")
-        // });
-        // modal.present();
-        // let modal = this.modal.create(NotifiedPage);
-        // let me = this;
-        // modal.onDidDismiss(data => {
-        
-        // });
-        // modal.present();
-    }
+    var favorate_list=this.afDatabase.list("profile/"+this.uid+"/favorite", {preserveSnapshot:true})
+    favorate_list.subscribe(snapshots=>{
+      this.favorite_information=[];
       
-    //  let headers = new Headers({ 'Authorization': 'Bearer Xw8t8tVjgtT0t--jRrsD7oFqZEq2AFBIjF9XSwoqAuYAAAFdv6Kaqg' });
-    // let options = new RequestOptions({ headers: headers });
-    //   this.http.get('https://kapi.kakao.com/v1/user/me', options).toPromise().then((res)=>{
-    //       console.log(res.json())
-    //       alert(res.json());
-    //   }).catch((error)=>{
-    //     alert(error);
-    // })
-     
-        // 
-  var notificationOpenedCallback = function(jsonData) {
-    console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-    alert("1")
-    alert(JSON.stringify(jsonData));
-  };
+      snapshots.forEach(element=>{
+        this.favorite_information.push(element.val());
+      })
+      console.log(this.favorite_information.length);
+      console.log(this.favorite_information[0]);
+      console.log("hai")
+      this.favorite.next(this.favorite_information);
+    })
+
+    
+    
     //       window["plugins"].OneSignal
     // .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
   	// .handleNotificationOpened(notificationOpenedCallback)
     // .endInit();
- 
-
-    }
-    dragging(trigger){
-        if(trigger){
-            this.drag_second.next(true);    
-        }else{
-            this.drag_second.next(false);
-        }
     }
     
+  ionViewDidLoad(){
+
+  }
+  ionViewDidEnter(){
+  }
+  locator(value){
+    
+      
+     
+      if(value=="start"){
+        this.getGeoCoding(this.latOnly,this.lngOnly,"start");
+      }else if(value=="end"){
+       
+      }
+  }
     createMarkerForStart(location){
          this.Marker=new google.maps.Marker({
             map : this.map,
@@ -202,12 +223,146 @@ export class MapDirective implements OnInit,OnChanges  {
             }
         }
     }
-    ngOnChanges() {
-        if(this.requested){
-            this.count=0;
-            this.count2=0;
-            alert("true")
+    resetMarker(){
+        
+        console.log("reset");
+        console.log(this.startMarker);
+        console.log(this.endMarker);
+        for(var i=0; i<this.startMarker.length; i++){
+            this.startMarker[i].setMap(null);
+            
         }
+        this.startMarker=[];
+        for(var i=0; i<this.endMarker.length; i++){
+            this.endMarker[i].setMap(null);
+        }
+        this.endMarker=[];
+       
+        this.notifyingChange.next({flag:false})
+        if(this.map!=undefined){
+
+            this.map.panTo(this.currentLocation)
+            this.map.setZoom(15)
+        }
+    }
+    resetStartMarker(value){
+        if(this.startMarker!=undefined){
+            if(this.startMarker.length!=0){
+                console.log("length : "+this.startMarker.length);
+                if(value==true){
+                    console.log(this.startMarker.length+"중 마지막을지운다.");
+                    this.startMarker[this.startMarker.length-1].setMap(null);
+                }else if(value=="confirm"){
+                    for(var i=0; i<this.startMarker.length; i++){
+                        if(i!=(this.startMarker.length-1)){
+                            console.log(i+"s delete");
+                            this.startMarker[i].setMap(null);
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+    resetEndMarker(value){
+        if(this.endMarker!=undefined){
+            if(this.endMarker.length!=0){
+                console.log("length : "+this.endMarker.length);
+                if(value==true){
+                    console.log(this.endMarker.length+"endmarker 중 마지막을지운다.");
+                    this.endMarker[this.endMarker.length-1].setMap(null);
+                }else if(value=="confirm"){
+                    for(var i=0; i<this.endMarker.length; i++){
+                        if(i!=(this.endMarker.length-1)){
+                            console.log(i+"s delete");
+                            this.endMarker[i].setMap(null);
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+    ngOnChanges() {
+        console.log("this.makeMarker");
+        console.log(this.makeMarker);
+        if(this.makeMarker=="start"){
+            console.log("makeMarker");
+            console.log(this.makeMarkerInformation)
+            
+            var loc=new google.maps.LatLng(this.makeMarkerInformation.lat,this.makeMarkerInformation.lng);
+            this.checkIfStartExistThenDelete();
+            var startMarker=new google.maps.Marker({
+              map : this.map,
+              position:loc,
+              icon:'assets/icon/start2.png'
+          })
+          console.log(loc);
+          console.log(this.makeMarkerInformation.lat+",,,"+this.makeMarkerInformation.lng)
+          this.startMarker.push(startMarker);
+          this.map.panTo(loc)
+          this.makeMarker="s"
+        }else if(this.makeMarker=="end"){
+            console.log("makeMarkerend");
+            console.log(this.makeMarkerInformation)
+            
+            var loc=new google.maps.LatLng(this.makeMarkerInformation.lat,this.makeMarkerInformation.lng);
+            this.checkIfEndExistThenDelete();
+            var endMarker=new google.maps.Marker({
+              map : this.map,
+              position:loc,
+              icon:'assets/icon/end.png'
+          })
+          this.endMarker.push(endMarker);
+          this.map.panTo(loc)
+          console.log(loc);
+          console.log(this.makeMarkerInformation.lat+",,,"+this.makeMarkerInformation.lng)
+          this.makeMarker="e"
+        }
+        console.log("mapngchanges3")
+        console.log(this.resetAll);
+       if(this.resetAll==true||this.resetAll==false){
+           this.resetMarker();
+           this.resetAll="undefined"
+       }
+        console.log("resetStart:"+this.resetStart);
+        console.log(this.resetStartt);
+        if(this.resetStart==true||this.resetStart==false){
+            console.log("reststartmarker"+this.resetStartt)
+            if(this.resetStartt==true||this.resetStartt==false){
+                console.log("start eliminate")
+                this.checkIfStartExistThenDelete()
+                this.resetStartt="ffff";
+            }
+          
+        }
+
+        if(this.resetStarttt==true||this.resetStarttt==false){
+            this.resetStartMarker("confirm")
+            console.log("하나빼고 다지움");
+            this.resetStarttt="f";
+        }
+        if(this.resetEnddd==true||this.resetEnddd==false){
+            this.resetEndMarker("confirm");
+            this.resetEnddd="t";
+        }
+        if(this.resetEnd==true||this.resetEnd==false){
+            console.log("restEndmarker"+this.resetStartt)
+            if(this.resetEndd==true||this.resetEndd==false){
+                this.resetEndMarker(true);
+                this.resetEndd="ff";
+            }else if(this.resetEndd=="confirm"){
+                this.resetEndMarker("confirm")
+            }
+        }
+        this.flag=this.changeMarker
+      
+        if(this.deliverer_location!=undefined){
+            //유저가 배달원의 위치를 볼수 있도록 pan To 한다. 
+            var location=new google.maps.LatLng(this.deliverer_location.lat,this.deliverer_location.lng);
+            this.map.panTo(location);
+        }
+        
         if(this.startLat!=undefined||this.startLat!=null){
             let location2={lat:this.startLat,lng:this.startLng};
             this.centerLocation(location2);
@@ -218,23 +373,152 @@ export class MapDirective implements OnInit,OnChanges  {
             let location={lat:this.endLat,lng:this.endLng};
             this.centerLocation(location);
             this.createMarkerForEnd(location);
-           
         }
 
         console.log("map changed");
         console.log(this.startstn+","+this.endstn);
-       
-        
+        if(this.panningToMiddle==true||this.panningToMiddle==false){
+            console.log(this.panningLocation);
+            console.log("hihihi")
+            var loc=new google.maps.LatLng(this.panningLocation[0].lat()*0.998,this.panningLocation[0].lng());
+            var bounds = new google.maps.LatLngBounds();
+            console.log(loc)
+            var distance=this.panningLocation[1];
+            console.log(distance);
+            for(var i=0; i<this.startMarker.length; i++){
+                console.log(this.startMarker[i].position.lat())
+                console.log(this.startMarker[i].position.lng())
+            }
+            var loc=new google.maps.LatLng(this.startMarker[this.startMarker.length-1].position.lat(),this.startMarker[this.startMarker.length-1].position.lng())
+            var loc2=new google.maps.LatLng(this.endMarker[this.endMarker.length-1].position.lat(),this.endMarker[this.endMarker.length-1].position.lng())
+            bounds.extend(loc);
+            bounds.extend(loc2)
+            console.log(bounds);
+            console.log(bounds.b);
+            console.log(bounds.sc);
+            this.map.fitBounds(bounds);
+            console.log(this.map);
+            console.log(this.map.getCenter());
+            console.log(this.map.getCenter().lat())
+           
+            console.log("panningToMiddle");
+            if(distance<1){
+                var newloc=new google.maps.LatLng(this.map.getCenter().lat()*0.9999,this.map.getCenter().lng())
+                this.map.setCenter(newloc);
+                this.map.setZoom(14);
+            }else if(distance<3){
+                var newloc=new google.maps.LatLng(this.map.getCenter().lat(),this.map.getCenter().lng())
+                this.map.setCenter(newloc);
+                this.map.setZoom(13);
+            }else if(distance<5){
+                console.log("5km")
+                var newloc=new google.maps.LatLng(this.map.getCenter().lat(),this.map.getCenter().lng())
+                this.map.setCenter(newloc);
+                this.map.setZoom(13);
+            }else if(distance<7){
+                console.log("5.xkm")
+                var newloc=new google.maps.LatLng(this.map.getCenter().lat()*0.9995,this.map.getCenter().lng())
+                this.map.setCenter(newloc);
+                this.map.setZoom(12);
+            }else{
+                console.log("more than 7km")
+                var newloc=new google.maps.LatLng(this.map.getCenter().lat()*0.999,this.map.getCenter().lng())
+                this.map.setCenter(newloc);
+                this.map.setZoom(11);
+            }
+            this.panningToMiddle="p"
+                          
+        }
     }
     calling(){
 
     }
-    
+   
+
     ngOnInit(){
-        this.map=this.createMap();
-        this.getCurrentLocation2().subscribe(currentLocation=>{
-           
+        
+        
+        var count=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
+        count.subscribe(snapshots=>{
+      
+         snapshots.forEach(element => {
+             if(element.val().user==this.userId){
+                 this.count_number++;
+            }
+         })
+         this.count.next(this.count_number);
         });
+
+        var start=this.afDatabase.list('profile/'+this.uid+'/start', { preserveSnapshot: true })
+        
+        start.subscribe(snapshots=>{
+            this.start_list=[];
+         snapshots.forEach(element => {
+             this.start_list.push(element.val());
+         })
+         this.start_list=Array.from(new Set(this.start_list))
+         
+         this.start_list.sort(function(a,b){
+            let dateA = +new Date(a.searchedTime);
+             let dateB = +new Date(b.searchedTime);
+            return dateB-dateA;
+         })
+         for(var i=1; i<this.start_list.length; i++){
+            this.start_list.splice(i,1);
+         }
+         
+         this.start.next(this.start_list);
+        });
+
+        var end=this.afDatabase.list('profile/'+this.uid+'/end', { preserveSnapshot: true })
+        
+        end.subscribe(snapshots=>{
+            this.end_list=[];
+         snapshots.forEach(element => {
+             this.end_list.push(element.val());
+         })
+         this.end_list=Array.from(new Set(this.end_list))
+         this.end_list.sort(function(a,b){
+            let dateA = +new Date(a.searchedTime);
+             let dateB = +new Date(b.searchedTime);
+            return dateB-dateA;
+         })
+         for(var i=1; i<this.end_list.length; i++){
+           this.end_list.splice(i,1);
+        }
+         this.end.next(this.end_list);
+        });
+        this.map=this.createMap();
+        // var current=localStorage.getItem("currentPosition");
+        // var lat=localStorage.getItem("lat");
+        // var lng=localStorage.getItem("lng");
+        
+        // console.log(current);
+        // console.log(lat+","+lng);
+        // if(current=="true"){
+        //     //localstorage 에 현위치가 저장되어있으면 그것을 가져와서 노출시킨다.
+        //     var image = {
+        //         url: 'https://firebasestorage.googleapis.com/v0/b/ionic-173108.appspot.com/o/7e194ccf-e864-4206-aecf%2Fitsme.sketch?alt=media&token=84fe7679-49ac-45b3-a0cc-3182eeb067e0',
+        //         size: new google.maps.Size(15, 17),
+        //       };
+        //     console.log("true!")
+        //     this.checkIfCenterMarkerExist();
+        //     var centerMarker=new google.maps.Marker({
+        //         map: this.map,
+        //         icon:image,
+        //         position: new google.maps.LatLng(lat, lng),
+        //       })
+        //       this.centerMarker_array.push(centerMarker);
+        //       console.log(centerMarker)
+        //       console.log("?1")
+        //       var loc=new google.maps.LatLng(lat,lng);
+        //       this.map.panTo(loc)
+        // }else{
+            this.getCurrentLocation2().subscribe(currentLocation=>{
+                
+             });
+        // }
+        
     }
 centerLocation2(){
     this.isMapIdle=false;
@@ -250,20 +534,16 @@ centerLocation(location){
         this.isMapIdle=false;
         this.getCurrentLocation2().subscribe(currentLocation=>{
          this.map.panTo(currentLocation);    
-            
         });
     }
   }
   
-  updatedPickupLocation(location){
-    this.currentLocation=location;
-    this.centerLocation(location);
-  }
+//   updatedPickupLocation(location){
+//     this.currentLocation=location;
+//     this.centerLocation(location);
+//   }
   addMapEventListener(){
-    // google.maps.event.addListener(this.map,'dragstart',(event)=>{
-    //     console.log("addMapEventListener dragging"+event);
-    //     this.isMapIdle=false;
-    // })
+    
     // google.maps.event.addListener(this.map,'idle',(event)=>{
     //     console.log("idle"+event);
     //     console.log(this.refreshing);
@@ -279,14 +559,197 @@ centerLocation(location){
 
    
   }
+  checkIfStartExistThenDelete(){
+      console.log(this.startMarker.length);
+      if(this.startMarker!=undefined){
+        for(var i=0; i<this.startMarker.length;i++){
+            this.startMarker[i].setMap(null);
+        }
+      }
+  }
+  checkIfEndExistThenDelete(){
+    if(this.endMarker!=undefined){
+      for(var i=0; i<this.endMarker.length;i++){
+          this.endMarker[i].setMap(null);
+      }
+    }
+}
+getResult(v,flag,results){
+    console.log(results[0].geometry.location.lat()+",,,"+results[0].geometry.location.lng())
+    console.log(flag);
+    let today = new Date();
+    let dd:number;
+    let day:string;
+    let month:string;
+     dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+   var time=new Date().toLocaleTimeString('en-US', { hour12: false,hour: "numeric",minute: "numeric"});
+    dd<10?day='0'+dd:day=''+dd;
+    mm<10?month='0'+mm:month=''+mm;
+     var todayNoTime=month+'/'+day;
+    console.log("getResult!");
+    if(flag=="start"){
+        console.log("start selected")
+        this.startlat=results[0].geometry.location.lat();
+        this.startlng=results[0].geometry.location.lng()
+        var loc=new google.maps.LatLng(this.startlat,this.startlng);
+        this.checkIfStartExistThenDelete();
+        var startMarker=new google.maps.Marker({
+          map : this.map,
+          position:loc,
+          icon:'assets/icon/start2.png'
+      })
 
-  getGeoCoding(lat,lng){
-    this.count++;
+      this.startMarker.push(startMarker);
+      this.map.panTo(loc)
+      
+      console.log("list");
+      console.log(this.start_list);
+      var match_flag=false;
+      //즐겨찾기에 추가한다.
+      if(this.start_list.length==0){
+          //첫 추가
+        console.log("just add");
+        this.afDatabase.list("profile/"+this.uid+"/start").push({lat:this.startlat,lng:this.startlng,place:v,searchedTime:todayNoTime}).then(()=>{
+          
+        }).catch((error)=>{
+        });
+      }else{
+          //리스트에 즐겨찾기가 있다면, 조회해서 일치하는 것이 있으면 업데이트한다. 
+          //일치하는것이 없다면, 추가. 
+                var key="";
+                var list=this.afDatabase.list('profile/'+this.uid+'/start', {preserveSnapshot:true});
+                list.subscribe(snapshots=>{
+                    snapshots.forEach(element=>{
+                        console.log("element.val()"+element.val());
+                        if(element.val().place==v){
+                            console.log("matched");
+                            match_flag=true;
+                            console.log(element.key);
+                            key=element.key;
+                            
+                        }
+                    })
+                   
+                })
+                
+            if(match_flag){
+                var updating=this.afDatabase.object('profile/'+this.uid+'/start/'+key)
+                updating.update({
+                    searchedTime:todayNoTime
+                })
+            }
+            if(!match_flag){
+                console.log("just add");
+                this.afDatabase.list("profile/"+this.uid+"/start").push({lat:this.startlat,lng:this.startlng,place:v,searchedTime:todayNoTime}).then(()=>{
+                  
+                }).catch((error)=>{
+                });
+            }
+      }
+      
+      
+      }else{
+        console.log("end selected")
+      this.endlat=results[0].geometry.location.lat();
+      this.endlng=results[0].geometry.location.lng();
+      var loc=new google.maps.LatLng(this.endlat,this.endlng);
+      this.checkIfEndExistThenDelete();
+      var endMarker=new google.maps.Marker({
+          map : this.map,
+          position:loc,
+          icon:'assets/icon/end.png'
+      })
+      this.endMarker.push(endMarker);
+      this.map.panTo(loc)
+      var match_flag_end=false;
+      //즐겨찾기에 추가한다.
+      if(this.end_list.length==0){
+          //첫 추가
+        console.log("just adddd");
+        this.afDatabase.list("profile/"+this.uid+"/end").push({lat:this.endlat,lng:this.endlng,place:v,searchedTime:todayNoTime}).then(()=>{
+          
+        }).catch((error)=>{
+        });
+      }else{
+          //리스트에 즐겨찾기가 있다면, 조회해서 일치하는 것이 있으면 업데이트한다. 
+          //일치하는것이 없다면, 추가. 
+                var key="";
+                var list=this.afDatabase.list('profile/'+this.uid+'/end', {preserveSnapshot:true});
+                list.subscribe(snapshots=>{
+                    snapshots.forEach(element=>{
+                        console.log("element.val()"+element.val());
+                        console.log(element.val());
+                        if(element.val().place==v){
+                            console.log("matched");
+                            match_flag_end=true;
+                            console.log(element.key);
+                            key=element.key;
+                            
+                        }
+                    })
+                   
+                })
+                
+            if(match_flag_end){
+                var updating=this.afDatabase.object('profile/'+this.uid+'/end/'+key)
+                updating.update({
+                    searchedTime:todayNoTime
+                })
+            }
+            if(!match_flag_end){
+                console.log("just add");
+                console.log(this.endlat+","+this.endlng+",,"+v+",,,"+todayNoTime)
+                this.afDatabase.list("profile/"+this.uid+"/end").push({lat:this.endlat,lng:this.endlng,place:v,searchedTime:todayNoTime}).then(()=>{
+                  
+                }).catch((error)=>{
+                });
+            }
+      }
+      
+      
+    }
+    console.log(this.startlat+",,"+this.startlng+"!!"+this.endlat+"??"+this.endlng)
+    var showndistance=this.getdistance(this.startlat,this.startlng,this.endlat,this.endlng);
+    var loc=new google.maps.LatLng(results[0].geometry.location.lat(),results[0].geometry.location.lng())
+    console.log(results[0].geometry.location.lat()+"!"+results[0].geometry.location.lng())
+    
+      console.log(showndistance);
+     this.notifyingChangevalue=!this.notifyingChangevalue;
+     this.notifyingChange.next({distance:showndistance,flag:flag,loc:loc});
+    
+}
+  geocoding(v,flag){
+     
+    var service = new google.maps.places.AutocompleteService();
+    var location=new google.maps.Geocoder();
+      
+      location.geocode({'address':v},(results,status)=>{
+        if(status=='OK'){
+          console.log("result:")
+          console.log(this.startMarker);
+            this.getResult(v,flag,results);
+          
+        }
+        })
+  }
+  getdistance(slat,slng,elat,elng){
+    var showndistance = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(this.startlat, this.startlng),
+    new google.maps.LatLng(this.endlat, this.endlng));  
+    showndistance=parseInt(showndistance);
+    showndistance=showndistance/1000
+
+    return showndistance;
+    }
+
+  
+  getGeoCoding(lat,lng,flag){
 
     let request = {
               latLng: {lat:lat,lng:lng}
             };  
-            if(this.count<10){
+        var location=new google.maps.LatLng(lat,lng);
         this.geocoder=new google.maps.Geocoder();
         this.geocoder.geocode(request,  (results, status) => {
                     if (status == google.maps.GeocoderStatus.OK) {
@@ -296,54 +759,49 @@ centerLocation(location){
                        let gu = results[0].address_components[results[0].address_components.length-4].short_name;    
                        let dong=results[0].address_components[results[0].address_components.length-5].short_name; 
                        let detail=results[0].address_components[results[0].address_components.length-6].short_name; 
-                       this.full_address=city+" "+gu+" "+dong+" "+detail;
+                       var address=gu+" "+dong+" "+detail;
+                       console.log(address);
+                       var sending={address:address,slat:lat,slng:lng,flag:flag}
                        
-                       if(this.start_end){
-                        //this.home.startPoint=this.full_address;
-                        this.startLocation.next(this.full_address.substring(5))
-                        this.sLat.next(lat);
-                        this.sLng.next(lng);
-                        let loading=this.loading.create({
-                            content:'Loading...'
-                          })
-                          loading.present().then(()=>{
-                          })
-    
-                          setTimeout(()=>{
-                              loading.dismiss();
-                          },200)
-                       }else{
-                        this.eLat.next(lat);
-                        this.eLng.next(lng);
-                        this.endLocation.next(this.full_address.substring(5))
-                        let loading=this.loading.create({
-                            content:'Loading...'
-                          })
-                          loading.present().then(()=>{
-                          })
-    
-                          setTimeout(()=>{
-                              loading.dismiss();
-                          },200)
+                       if(flag=="start"){
+                        var startMarker=new google.maps.Marker({
+                            map : this.map,
+                            position:location,
+                            icon:'assets/icon/start2.png'
+                        })
+                        this.startMarker.push(startMarker);
+                       }else if(flag=="end"){
+                        var endMarker=new google.maps.Marker({
+                            map : this.map,
+                            position:location,
+                            icon:'assets/icon/end.png'
+                        })
+                        this.map.panTo(location);
+
+                        this.endMarker.push(endMarker);
                        }
+                       this.full_address.next(sending);
                       } else {
                         alert("No address available");
                       }
                     }
                   });
-    }
    
-    // this.nativeGeocoder.reverseGeocode(52.5072095, 13.1452818)
-    // .then((result: NativeGeocoderReverseResult) => console.log('The address is ' + result.street + ' in ' + result.countryCode))
-    // .catch((error: any) => console.log(error));
-           
-
 }
     createMap(location=new google.maps.LatLng(37.5665,126.9780)){
         let mapOptions={
             center:location,
             zoom:15,
-            disableDefaultUI: false
+            mapTypeControl: false,
+            
+            zoomControl: true,
+            zoomControlOptions: {
+                position: google.maps.ControlPosition.LEFT_CENTER
+            },
+            scaleControl: false,
+            streetViewControl: false,
+            
+            fullscreenControl: false
         }
         let mapEl=document.getElementById('map');
         let map=new google.maps.Map(mapEl,mapOptions);
@@ -351,62 +809,123 @@ centerLocation(location){
             // alert(map.getZoom());
             //zoom detect
         })
-        google.maps.event.addListener(map,'click',(event)=>{
-            this.count2++;
-            if(this.count2<3){
-                this.start_end=!this.start_end;
-                //start_end 가 트루이면, 출발입력하는 것. 
-                
-                console.log("mouseup????????????"+event.latLng.lat()+","+event.latLng.lng());
-                console.log(event);
-                
-                this.lat=event.latLng.lat();
-                this.lng=event.latLng.lng();
-                var location=new google.maps.LatLng(this.lat,this.lng) 
-                if(this.start_end){
-                    let startMarker=new google.maps.Marker({
-                        map : map,
-                        position:location,
-                        icon:'assets/icon/start2.png'
-                    })
-                }else
-                {
-                    let endMarker=new google.maps.Marker({
-                        map : map,
-                        position:location,
-                        icon:'assets/icon/end.png'
-                    })
-                }
-                
-                this.getGeoCoding(this.lat,this.lng);
-            }
-            
+        google.maps.event.addListener(map,'dragstart',(event)=>{
+            this.dragging.next(true);
         })
+        google.maps.event.addListener(map,'dragend',(event)=>{
+            this.dragging.next(false);
+            let request = {
+                latLng: {lat:map.getCenter().lat(),lng:map.getCenter().lng()}
+              };  
+              var location=new google.maps.LatLng(map.getCenter().lat(),map.getCenter().lng());
+            this.geocoder=new google.maps.Geocoder();
+            this.geocoder.geocode(request,  (results, status) => {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                          if (results[0] != null) {
+                                             
+                           let city=results[0].address_components[results[0].address_components.length-3].short_name; 
+                           let gu = results[0].address_components[results[0].address_components.length-4].short_name;    
+                           let dong=results[0].address_components[results[0].address_components.length-5].short_name; 
+                           let detail=results[0].address_components[results[0].address_components.length-6].short_name; 
+                           var address=dong+" "+detail;
+                           console.log(address);
+                           console.log(this.flag);
+                           if(this.flag=="startMarker"){
+                                var startMarker=new google.maps.Marker({
+                                    map : map,
+                                    position:location,
+                                    icon:'assets/icon/start2.png'
+                                })
+                                this.startMarker.push(startMarker);
+                                console.log(this.startMarker);
+                                this.startlat=map.center.lat();
+                                this.startlng=map.center.lng();
+                           }else if(this.flag=="endMarker"){
+                               console.log("endmarker");
+                             var endMarker=new google.maps.Marker({
+                                map : map,
+                                position:location,
+                                icon:'assets/icon/end.png'
+                            })
+                            this.endMarker.push(endMarker);
+                            this.endlat=map.getCenter().lat();
+                            this.endlng=map.getCenter().lng();
+                           }
+                          
+                           var data={address:address,location:request,flag:this.flag}
+                          this.new_address.next(data);
+            
+        }
+    }
+            })
+        })
+    //       google.maps.event.addListener(map,'mouseup',(event)=>{
+        
+    // })
+    
+        this.mapIsCreated.next("true")
         return map;
     }
+    checkIfCenterMarkerExist(){
+        console.log(this.centerMarker_array);
+        if(this.centerMarker_array!=undefined){
+            for(var i=0; i<this.centerMarker_array.length; i++){
+                this.centerMarker_array[i].setMap(null);
+            }
+        }
+       
+    }
+    
       getCurrentLocation2(){
     let loading=this.loading.create({
       content:'위치정보를 받아오는 중...'
     })
     loading.present().then(()=>{
     })
-    let options={timeout:15000,maximumAge :5000,enableHighAccuracy:true}
+    let options={timeout:3500,maximumAge :3500,enableHighAccuracy:true}
     let locationObs=Observable.create(observable =>{
       this.geo.getCurrentPosition(options).then(resp=>{
       let lat=resp.coords.latitude;
       let lng=resp.coords.longitude;
       this.starting.next(lat);
       this.ending.next(lng);
+      this.latOnly=lat;
+      this.lngOnly=lng;
+      var image = {
+                url: 'https://firebasestorage.googleapis.com/v0/b/ionic-173108.appspot.com/o/7e194ccf-e864-4206-aecf%2Fitsme.png?alt=media&token=7f0e73d2-0d86-43e3-9ec1-7507d9666fdc',
+                size: new google.maps.Size(24, 30),
+              };
+    
       let location=new google.maps.LatLng(lat,lng);
+      this.currentLocation=location;
+      localStorage.setItem("currentPosition","true");
+      localStorage.setItem("lat",lat.toString())
+      localStorage.setItem("lng",lng.toString());
       this.map.panTo(location);
+      this.checkIfCenterMarkerExist();
+      var centerMarker=new google.maps.Marker({
+        map: this.map,
+        icon:image,
+        position: location,
+        title: 'Some location'
+
+      })
+      this.centerMarker_array.push(centerMarker);
+
+      
       loading.dismiss();
+      
     }).catch((error =>{
+        localStorage.setItem("currentPosition","false");
         //position error 발생시 다시 위치 추척
       console.log("error ! : "+error)
+      console.log(error.code+","+error.message);
       loading.dismiss();
     }))
     
     })
     return locationObs
   }
+
+
 }

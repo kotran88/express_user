@@ -2,23 +2,22 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 /**
- * Generated class for the ComponentsPage page.
+ * Generated class for the StandbyPage page.
  *
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
-@IonicPage()
 @Component({
-  selector: 'page-components',
-  templateUrl: 'components.html',
+  selector: 'page-standby',
+  templateUrl: 'standby.html',
 })
-export class ComponentsPage {
+export class StandbyPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad ComponentsPage');
+    console.log('ionViewDidLoad StandbyPage');
   }
 
 }

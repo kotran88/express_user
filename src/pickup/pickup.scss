@@ -1,13 +1,33 @@
 map{
 
-   .locator{
-       background-image:url('./../assets/icon/map-marker.png');
+   .start_flag{
+       background-image:url('./../assets/icon/start.svg');
        position: absolute;
-       left:51.3%;
-       top:55.3%; //커질수록 아래로 감.
-       width:32px;
-       height:32px;
-       margin-left: -25px;
-       margin-top: -50px;
+       left:52%;
+       top:43.5%; //커질수록 아래로 감. //iphone : 51 / 52 left / top
+       width:24px;
+       height:24px;
+       margin-left: -10px;
+       margin-top: -27px;
    }
+   .end_flag{
+    background-image:url('./../assets/icon/start.svg');
+    position: absolute;
+    left:52%;
+    top:43.5%; //커질수록 아래로 감.
+    width:24px;
+    height:24px;
+    margin-left: -10px;
+    margin-top: -27px;
+}
+.default{
+    background-image:url('');
+    position: absolute;
+    left:51.2%;
+    top:51%; //커질수록 아래로 감.
+    width:24px;
+    height:24px;
+    margin-left: -10px;
+    margin-top: -27px;
+}
 }

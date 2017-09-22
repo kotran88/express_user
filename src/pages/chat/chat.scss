@@ -9,6 +9,9 @@ page-chat {
     {
         font-family: 'Open Sans', sans-serif;
         }
+    .direct-chat-text:hover{
+        cursor: pointer;
+    }
     .popup-box {
        background-color: #ffffff;
         border: 1px solid #b0b0b0;
@@ -96,7 +99,7 @@ page-chat {
         margin: 7px;
         padding: 5px !important;
          border: medium none;
-        width: 80% !important;
+        width: 60% !important;
         float:left;
     }
     .popup-messages-footer {
@@ -125,7 +128,7 @@ page-chat {
     
     .popup-box .popup-messages {
         background: #3f9684 none repeat scroll 0 0;
-        height: 75%;
+        height: 93%;
         overflow: auto;
     }
     .direct-chat-messages {
@@ -133,12 +136,22 @@ page-chat {
         transform: translate(0px, 0px);
         
     }
-    .popup-messages .chat-box-single-line {
-        margin:auto;
+    .chat-box-single-line{
         border-bottom: 1px solid #a4c6b5;
         margin: 7px 0 20px;
         position: relative;
         text-align: center;
+        height: 100%;
+        margin-top: 7rem;
+        direct-chat-text{
+            background: #dfece7 none repeat scroll 0 0;
+            border: 1px solid #dfece7;
+            border-radius: 2px;
+            color: #1f2121;
+            width:30%;
+            left:60%;
+            text-align: none;
+        }
     }
     .popup-messages abbr.timestamp {
         background: #3f9684 none repeat scroll 0 0;
@@ -175,12 +188,7 @@ page-chat {
         color: #fff;
         padding: 0 11px;
     }
-    .popup-messages .chat-box-single-line {
-        border-bottom: 1px solid #a4c6b5;
-        margin: 7px 0 20px;
-        position: relative;
-        text-align: center;
-    }
+    
     .popup-messages .direct-chat-messages {
         height: 100%;
         overflow: scroll

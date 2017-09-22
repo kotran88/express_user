@@ -25,6 +25,7 @@ export class ProfilePage {
   phoneNumber = new PhoneNumber()
   verificationCode: string;
   pre:any;
+  email:string;
   line:any;
   line2:any;
    profile={} as Profile_User
@@ -36,8 +37,9 @@ export class ProfilePage {
   start:boolean;
   dup:boolean=false;
   nodup:boolean=false;
-  constructor(public navCtrl: NavController, public navParams: NavParams,private afAuth : AngularFireAuth, private afDatabase : AngularFireDatabase) {
+  constructor(public navCtrl: NavController, public param: NavParams,private afAuth : AngularFireAuth, private afDatabase : AngularFireDatabase) {
     this.start=true;
+    this.email=this.param.get("email");
       //  this.profile.foto="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png";
       //  this.profile.first=true;
   }
@@ -57,7 +59,6 @@ export class ProfilePage {
              console.log(item);
              console.log(element.val()[item]);
              if(item=="id"){
-               alert(item+","+element.val()[item]);
               if(element.val()[item]==this.profile.id){
                 this.result="중복된아이디입니다";
                 this.dup=true;
@@ -88,7 +89,6 @@ export class ProfilePage {
 
       this.windowRef.RecaptchaVerifier= new firebase.auth.RecaptchaVerifier('sign-in-button')
       this.windowRef.RecaptchaVerifier.render()
-      alert("rendered")
     }
   }
   verifyLoginCode(){
@@ -96,23 +96,35 @@ export class ProfilePage {
       console.log("result success");
       console.log(result);
       console.log(result.user);
+    }).catch((err)=>{
+      console.log(err)
+      console.log(err.code);
+      console.log(err.message);
     })
   }
   checkPhone(){
-    const appVerifier=this.windowRef.RecaptchaVerifier;
-    this.phoneNumber.country="82"
-    this.phoneNumber.area=this.pre
-    this.phoneNumber.prefix=this.line
-    this.phoneNumber.line=this.line2
-    this.phone_final=this.pre+"-"+this.line+"-"+this.line2;
-    const num=this.phoneNumber.e164;
-    const re=firebase.auth().signInWithPhoneNumber(num,appVerifier).then(result=>{
-      console.log(result);
-      this.windowRef.confirmationResult=result;
-    }).catch(error=>{
-      alert("error : "+error);
-    })
-    console.log("rrr");
+    if(this.pre==undefined||this.line==undefined||this.line2==undefined){
+      console.log("none!")
+    }else{
+      const appVerifier=this.windowRef.RecaptchaVerifier;
+      var a=appVerifier.verify()
+      console.log(a);
+      console.log("appVerifier");
+      console.log(appVerifier);
+      this.phoneNumber.country="82"
+      this.phoneNumber.area=this.pre
+      this.phoneNumber.prefix=this.line
+      this.phoneNumber.line=this.line2
+      this.phone_final=this.pre+"-"+this.line+"-"+this.line2;
+      const num=this.phoneNumber.e164;
+      const re=firebase.auth().signInWithPhoneNumber(num,appVerifier).then(result=>{
+        alert(result);
+        this.windowRef.confirmationResult=result;
+      }).catch(error=>{
+        alert("error : "+error);
+      })
+    }
+    
   }
   createProfile(){
     this.second=true;
@@ -132,12 +144,21 @@ export class ProfilePage {
       if(this.phone_final==undefined||this.phone_final==""){
         this.phone_final="010-7999-8598"
       }
+      
+      this.profile.email=this.email;
       this.profile.phone=this.phone_final;
-      this.profile.name="고객";
+      this.profile.name="정긍정"
+      this.profile.type="고객";
       this.profile.created_date=todayWithTime
       this.profile.foto=localStorage.getItem("foto");
-      localStorage.setItem("firstLogin","false");
       this.afDatabase.object('profile/'+auth.uid+'/').set(this.profile)
+      localStorage.setItem("id",this.profile.id);
+      alert("가입이 완료되었습니다.")
+      this.afDatabase.list("profile/"+auth.uid+"/point").push({created:todayWithTime}).then(()=>{
+        alert("s")
+            }).catch((error)=>{
+            });
+      this.navCtrl.setRoot(HomePage);
     })
   }
 }

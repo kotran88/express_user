@@ -1,6 +1,5 @@
 import { AngularFireDatabase,    FirebaseListObservable
  } from 'angularfire2/database';
-import { FirebaseService } from './../../providers/firebase-service';
 import { Observable } from 'rxjs/Rx';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
@@ -17,21 +16,34 @@ export class SimulateProvider {
   public directionsService:any;
   public myRoute:any;
   public myRouteIndex:number;
+  public delivery_Guy:string;
   cars_array:any;
   activeUserLocation:any;
    items: FirebaseListObservable<any>;
   coord:any;
   constructor(public afd:AngularFireDatabase) {
+    
     this.cars_array=[];
     this.activeUserLocation=[];
     this.directionsService=new google.maps.DirectionsService();
+    for (var i=0; i<this.activeUserLocation.length; i++){
+      }
+
+  }
+  initializeDelivery(deliveryGuy){
+    this.delivery_Guy=deliveryGuy;
+    
+  }
+  getUpdatedLocation(){
     this.items = this.afd.list('/employees_status/Available/', { preserveSnapshot: true });
     console.log('Hello SimulateProvider Provider');
     this.items.subscribe(snapshots=>{
         snapshots.forEach(element => {
-
+ 
           //특정유저로 한정시킨다. (여기서는 배송자 한사람에 대해서만 보여주면 되기에 한명으로 한정함. )
-          if(element.val().userid=="kotraner"){
+          if(element.val().userid==this.delivery_Guy){
+            console.log("deliveryGuy is : "+this.delivery_Guy);
+           
             this.activeUserLocation.push(element.val());
             console.log("pushed");
             console.log(element.val());
@@ -40,21 +52,14 @@ export class SimulateProvider {
           
         });
     })
-      for (var i=0; i<this.activeUserLocation.length; i++){
-      }
-
   }
- 
   getCars(lat,lng){
-    console.log("getCars");
-    let carData=this.cars[this.carIndex];
+    this.getUpdatedLocation();
+    console.log("getCarsDD"+this.delivery_Guy);
     this.carIndex++;
     if(this.carIndex>this.cars.length-1){
       this.carIndex=0;
     }
-    console.log(carData);
-    console.log(carData.cars[0]);
-    console.log(carData.cars[0].coord.lat+",,,,"+carData.cars[0].coord.lng);
     console.log(this.activeUserLocation.length);
     console.log("sssasdasda");
     console.log(this.activeUserLocation)
@@ -86,7 +91,6 @@ export class SimulateProvider {
     console.log("this.cars");
     console.log(this.cars);
     console.log("return on the verge of ");
-    console.log(carData);
     console.log(this.cars_array);
     return Observable.create(
       observer=>observer.next(this.cars_array)

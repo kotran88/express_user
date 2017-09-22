@@ -1,10 +1,10 @@
 page-view-request-list {
     .title_title{
-        line-height:4.5rem;
-        float:left;
-        padding:0;
-        width: 25%;
-        margin-left:20px;
+        line-height: 5rem;
+        float: left;
+        padding: 0;
+        width: 50%;
+        margin-left: 20px;
     }
     .title{
         line-height:4.5rem;
@@ -13,7 +13,19 @@ page-view-request-list {
         padding:0;
         width: 70%;
     }
+
+    .viewStyle{
+        width:40%;
+        float:left;
+        margin-top:auto;
+        box-shadow:0 3px 9px 3px #999;}
+    .viewStyle:active{
+        transform: translateY(4px);
+        box-shadow:0 3px 5px 3px #999;
+    }
     .chat{
+        float: left;
+        border: solid 1px;
         background-color:transparent;
         color:#000;
     }

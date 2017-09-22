@@ -7,6 +7,7 @@
 <div class="modal_content">
     
     <div class="header">배달 종료!!</div>
+    <hr>
     <div class="content_main">
       <div class="image">
         <img src="{{foto}}"/>
@@ -16,9 +17,12 @@
           배달자 이름 : {{name}}<br>
       </div> 
     </div>
+    <div class="rating_header">
+      리뷰를 남겨주시면 이용자들에게 큰 도움이 됩니다.
+    </div>
     <ion-rating (ionClick)="log($event)"> </ion-rating>
     <div class="content_text">
-        <textarea name="review" [(ngModel)]="text" id="" cols="45" rows="5" style="width:100%" class="review"></textarea>
+        <textarea name="review" placeholder="이곳에 리뷰를 남겨주세요" [(ngModel)]="text" id="" cols="45" rows="5" style="width:100%" class="review"></textarea>
     </div>
     <div class="footer">
       <button class="confirm" ion-button (click)="review()">리뷰남기기</button>

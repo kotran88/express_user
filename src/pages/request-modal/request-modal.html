@@ -1,59 +1,252 @@
 
+<ion-header>
+        <ion-navbar>
+          <ion-title class="header">
+                배달 상세 내용
+          </ion-title>
+        </ion-navbar>
+      </ion-header>
+
 <ion-content class="main-view" padding>
     
-  <div class="modal_content">
       
-      <div class="header">배달 상세 내용</div>
       <div class="content_main">
         
-        <div class="info">
-            출발지 : {{start}}<br>
-            end : {{end}}<br>
-        </div> 
-        <div class="freight">
-          <div class="img_forward">
-            <img src="{{img_forward}}" (click)="forward_clicked()"/>
-          </div>
-          <div class="img_backward">
-            <img src="{{img_backward}}" (click)="backward_clicked()"/>
-          </div>
+            <div class="info">
+                    
+                    <div    class="label">
+                                배송정보
+                    <button   style="float:right" class="btn" ion-button (click)="favorite()">가져오기</button>
+                </div> 
+               
+                
+            <div class="flag_info_show">
+                    <div class="start">
+                        <div class="label">
+                                출발지점
 
-          <div class="freight_info">
-            <div class="freight_content">
-                <ion-list>
-                    <ion-item>
-                        <input type="text" name="" placeholder="화물 내용을 입력하세요" [(ngModel)]="content">
-                    </ion-item>
-                  </ion-list>
+                        </div>
+                        
+                        <div class="label_content">
 
+                                <div class="start_address">
+                                        {{start}}
+                                </div>
+                                <!-- <div class="info_button">
+                                        <button  style="float:right" class="btn" ion-button (click)="add(start)">리스트에<br> 추가</button>
+                                </div> -->
+                                <div class="start_address">
+                                        {{startDetail}}
+                                </div>
+                        </div>
+                            
+                        
+                    </div>
+                    <div class="end">
+                        <div class="label">
+                                도착지점
+                        </div>
+                        <div class="label_content">
+                            <div class="end_address">
+                               {{end}}
+                            </div>
+                            <!-- <div class="info_button">
+                                    <button  style="float:right" class="btn" ion-button (click)="add(end)">리스트에<br> 추가</button> 
+                            </div> -->
+                            <div class="end_address">
+                                    {{endDetail}}
+                            </div>
+                        </div>
+                           
+                    </div>
+                    <div style="margin-bottom:10px; margin-left:15px; width:80%;" class="cellphone">
+                            <ion-input type="number" placeholder="휴대전화번호를 입력해주세요" class="input" [ngModel]="cellphone"></ion-input>
+                    </div>
             </div>
-            <div class="freight_weight">
-                <ion-list>
-                    <ion-item>
-                        <input type="text" name="" placeholder="화물 무게을 입력하세요" [(ngModel)]="weight">
-                    </ion-item>
-                  </ion-list>
+               
+            <div class="flag_info_noshow" *ngIf="!info">
+                    s
             </div>
-            <div class="freight_size">
-                <ion-list>
-                    <ion-item>
-                        <input type="text" name="" placeholder="화물 크기를 입력하세요" [(ngModel)]="size">
-                    </ion-item>
-                  </ion-list>
+    </div>
+                <hr>
+                <div class="time">
+                    <div (click)=toggle(2) class="label">
+                        <label>희망 배송 시간을 선택해주세요</label>
+                          <ion-icon *ngIf="!flag_payment_info" name="arrow-dropdown"></ion-icon>
+                          <ion-icon *ngIf="flag_payment_info" name="arrow-dropup"></ion-icon>
+                      </div> 
+                  <div class="flag_payment_info_show" *ngIf="time">
+                        <ion-item>
+                                <ion-label>현재시간 기준</ion-label>
+                                <ion-select (ionChange)="timeChanged()" [(ngModel)]="desiredTime">
+                                  <ion-option value="ASAP">가능한 빨리</ion-option>
+                                  <ion-option value="1to2">1~2시간이내</ion-option>
+                                  <ion-option value="3to6">3~6시간이내</ion-option>
+                                  <ion-option value="today">오늘 이내</ion-option>
+                                </ion-select>
+                              </ion-item>
+                  </div>
+                  <div class="flag_payment_info_noshow" *ngIf="!time">
+                  </div>
+                 
+                        
+          </div> 
+                <hr>
+                <div class="freight">
+                        
+                            <div  class="label">
+                                    <label>배송품 정보</label>
+                                </div> 
+                            <div class="flag_payment_info_show" *ngIf="freight">
+                                    <div class="image_container">
+                                            <div style="width:30%; float:left" [ngClass]="viewStyle_normal ? 'img_normal' : 'img_normal-clicked'">
+                                                <img src="{{img_backward}}" (click)="selectedValue('normal')"/>
+                                            </div>
+                                            <div style="width:30%; float:right"[ngClass]="viewStyle_heavy ? 'img_heavy' : 'img_heavy-clicked'">
+                                                <img src="{{img_backward}}" (click)="selectedValue('heavy')"/>
+                                            </div>
+                                    </div>
+        
+                                    
+                                    <div class="content_text">
+                                            <textarea name="review" placeholder="기타 요구사항/ 하실 말씀을 적어주세요!" [(ngModel)]="request_text" id="" cols="45" rows="5" style="width:100%" class="review"></textarea>
+                                        </div>  
+                            </div>
+                            <div class="flag_payment_info_noshow" *ngIf="!freight">
+                            </div>
+                    </div> 
+
+                    <hr>
+                    <div class="payment_mean">
+                            <div  class="label">
+                                    <label>결제 수단</label>
+                                    
+                                </div> 
+                                <div (click)=toggle(4)  class="point" >
+                                        앱결제
+                                        <ion-icon *ngIf="!app_payment" name="arrow-dropdown"></ion-icon>
+                                        <ion-icon *ngIf="app_payment" name="arrow-dropup"></ion-icon>
+                                        <div class="flag_payment_info_show" *ngIf="app_payment">
+                                                앱결제 보여주다
+                                        </div>
+                                        <div class="flag_payment_info_noshow" *ngIf="!app_payment">
+                                            </div>
+                                </div>
+                                <div (click)=toggle(5)  class="point" >
+                                        현금결제
+                                        <ion-icon *ngIf="!flag_payment_mean" name="arrow-dropdown"></ion-icon>
+                                        <ion-icon *ngIf="flag_payment_mean" name="arrow-dropup"></ion-icon>
+                                        <div class="flag_payment_info_show" *ngIf="flag_payment_mean">
+                                                보여주다
+                                                </div>
+                                        <div class="flag_payment_info_noshow" *ngIf="!flag_payment_mean">
+                                            </div>
+                                </div>
+                                
+                           
+
+                    </div> 
+                    <hr>
+                    <div class="discount">
+                            <div  class="label">
+                                    <label>할인 혜택</label>
+                                    
+                                </div> 
+                                <div (click)=toggle(6) class="point">
+                                    포인트 사용 *적립포인트는 1000pㅣ사시 사용 가능
+                                   
+                                    <ion-icon *ngIf="!discount" name="arrow-dropdown"></ion-icon>
+                                    <ion-icon *ngIf="discount" name="arrow-dropup"></ion-icon>
+
+                                    <div class="flag_payment_info_show" *ngIf="discount">
+                                            <hr>
+                                            <div  class="discount_point">
+                                                사용가능 0p ({{point}} p 보유)<br>
+                                                <div style="display: inline-flex;"class="m">
+                                                        <div style="float:left"  class="f">
+                                                                <ion-input placeholder="" class="input_point" [ngModel]="pointtouse"></ion-input>
+                                                        </div>
+                                                        <div style="float:right;margin-top: 2rem;" class="e">
+                                                                <ion-checkbox (ionChange)=pointChecked() [(ngModel)]="pointAll" disabled="false">전액사용</ion-checkbox>전액사용
+                                                        </div>
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            <!-- <div class="coupon">
+                                                    쿠폰 코드를 입력해주세요<br>
+                                                    <ion-input placeholder="" class="input_point" [ngModel]="coupon"></ion-input>
+                                                </div> -->
+                                    </div>
+                                    <div class="flag_payment_info_noshow" *ngIf="!discount">
+                                        </div>
+                                </div>
+                                <div (click)=toggle(8) class="point">
+                                        쿠폰 사용 
+                                       
+                                        <ion-icon *ngIf="!coupon" name="arrow-dropdown"></ion-icon>
+                                        <ion-icon *ngIf="coupon" name="arrow-dropup"></ion-icon>
+    
+                                        <div class="flag_payment_info_show" *ngIf="coupon">
+                                                <hr>
+                                                <div class="discount_point">
+                                                        쿠폰 코드를 입력해주세요<br>
+                                                        <ion-input placeholder="" class="input_point" [ngModel]="coupon"></ion-input>
+                                                </div>
+                                                <!-- <div class="coupon">
+                                                       </div> -->
+                                        </div>
+                                        <div class="flag_payment_info_noshow" *ngIf="!coupon">
+                                            </div>
+                                    </div>
+                           
+                            
+                    </div>
+                    <hr>
+                    <div class="payment">
+                            <div style="font-size:1.8rem;" style="text-align: center;" class="label">
+                                    <label>결제 금액</label>
+                                </div> 
+                                <div class="final_price">
+                                    {{final_price}} 원
+                                </div>
+                            <div class="flag_payment_info_show" >
+                                    <hr>
+                                    거리 : {{distance}} km <br>
+                                    3키로 초과부분부터 100m당 50원씩 가산되어 총 금액이 결정됩니다.<br>
+                                    총 금액 : {{price}}
+                                    할인내역 : {{discount_price}}<br>
+                                    <hr>
+                                    포인트 : {{mileage}} 적립<br>
+
+                                    결제시 약관동의가 필요합니다.(필수)<br>
+                                    <ion-checkbox [(ngModel)]="checked" disabled="false"></ion-checkbox>
+                                    개인정보 제 3자 제공 동의  <a href="http://naver.com" >약관보기</a>
+                            </div>
+                    </div>
+                    <hr>
+                  <!-- <div class="freight_info">
+                        <div class="type_image">
+                            <div [ngClass]="viewStyle_normal ? 'img_normal' : 'img_normal-clicked'">
+                                <img src="{{img_backward}}" (click)="selectedValue('normal')"/>
+                            </div>
+                            <div [ngClass]="viewStyle_heavy ? 'img_heavy' : 'img_heavy-clicked'">
+                                <img src="{{img_backward}}" (click)="selectedValue('heavy')"/>
+                            </div>
+                        </div>
+                        <div class="content_text">
+                            <textarea name="review" placeholder="기타 요구사항/ 하실 말씀을 적어주세요!" [(ngModel)]="request_text" id="" cols="45" rows="5" style="width:100%" class="review"></textarea>
+                        </div>
+                     </div> -->
+        
+                    
                   
-            </div>
-            <div class="content_text">
-                <textarea name="review" placeholder="기타 요구사항/ 하실 말씀을 적어주세요!" [(ngModel)]="request_text" id="" cols="45" rows="5" style="width:100%" class="review"></textarea>
-            </div>
-          </div>
         </div>
         
       
-      </div>
       
       <div class="footer">
-        <button class="confirm" ion-button (click)="confirm()">제출</button>
+        <button class="confirm" ion-button (click)="confirm()">신청하기</button>
       </div>
    
-  </div>
   </ion-content>

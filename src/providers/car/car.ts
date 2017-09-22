@@ -1,5 +1,4 @@
 import { AngularFireDatabase } from 'angularfire2/database';
-import { FirebaseService } from './../../providers/firebase-service';
 import { SimulateProvider } from './../simulate/simulate';
 import { Observable } from 'rxjs/Rx';
 import { Injectable } from '@angular/core';
@@ -22,7 +21,8 @@ export class CarProvider {
   getPickupCar(){
     return this.simulate.getPickupCar();
   }
-  getCars(lat,lng){
+  getCars(lat,lng,delivery_guy){
+    this.simulate.initializeDelivery(delivery_guy);
     return Observable
       .interval(5000)
       .switchMap(()=>

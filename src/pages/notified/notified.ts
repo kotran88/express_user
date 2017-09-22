@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
-
+import { ChatPage } from './../chat/chat';
 /**
  * Generated class for the NotifiedPage page.
  *
@@ -16,7 +16,7 @@ export class NotifiedPage {
   time:any;
   distance:any;
   foto:any;
-
+  itemObject:any;
   constructor(public navCtrl: NavController,public viewCtrl:ViewController, public navParams: NavParams) {
   }
 
@@ -25,6 +25,7 @@ export class NotifiedPage {
     this.time=this.navParams.get("time")
     this.distance=this.navParams.get("distance")
     this.foto=this.navParams.get("foto")
+    this.itemObject=this.navParams.get("itemObject")
     if(this.id==undefined||this.id==null){
       this.id="test Id "
     }
@@ -34,6 +35,9 @@ export class NotifiedPage {
   }
   log(value){
     console.log(value)
+  }
+  chat(){
+    this.navCtrl.push(ChatPage,{item:this.itemObject})
   }
   goBack(){
       this.viewCtrl.dismiss();

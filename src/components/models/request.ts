@@ -14,9 +14,13 @@ export interface request{
     deliveryGuy:string
     rating_content:string;
     rating:string;
-
-    freight_weight:string;
-    freight_size:string;
-    freight_content:string;
+    senderuid:string
+    desired_time:string;
+    type:string;
     request_text:string;
+
+    distance:string
+
+    startDetail:string;
+    endDetail:string;
 }

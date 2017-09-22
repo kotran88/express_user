@@ -1,4 +1,4 @@
-page-finished {
+page-cameraselect {
     .image{
         width: 35%;
         height: 100%;
@@ -66,7 +66,7 @@ page-finished {
       }
         .modal_content {
           position: absolute;
-          top: calc(50% - (50%/2));
+          top: calc(50% - (60%/2));
           left: 0;
           right: 0;
           width: 90%;
@@ -87,5 +87,4 @@ page-finished {
           -webkit-box-sizing: border-box;
           overflow: hidden;
         }
-  }
-  
+}
