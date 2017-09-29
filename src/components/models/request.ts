@@ -23,4 +23,5 @@ export interface request{
 
     startDetail:string;
     endDetail:string;
+    phone:string;
 }

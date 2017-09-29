@@ -5,7 +5,13 @@ page-request-modal {
         width:50%;
         float:left;
     }
-    
+    .description{
+        margin-left:1.5rem;
+    }
+    .btn_right{
+        height:3.8rem;
+        float:right;
+    }
     .time{
         height: 40%;
         .time_list{
@@ -156,6 +162,7 @@ page-request-modal {
         color:blue;
     }
     .point{
+        display:flow-root;
         border: solid 1px;
         width: 100%;
         text-align: center;
@@ -269,11 +276,11 @@ page-request-modal {
         text-align: left;
     }
     .input_point{
+        float:left;
         background-color: white;
         width: 50%;
         text-align: center;
-        margin-left: auto;
-        margin-right: auto;
+        margin-left: 2rem;
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
     }

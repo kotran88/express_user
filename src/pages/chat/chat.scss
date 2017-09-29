@@ -107,11 +107,16 @@ page-chat {
         bottom: 0;
         position: absolute;
         width: 100%;
-    }
-    .popup-messages-footer .btn-footer {
-        overflow: hidden;
-        padding: 2px 5px 10px 6px;
-        width: 100%;
+        .bg_none{
+            width:10%; 
+            float:left;
+            margin-top:0.4rem;
+
+        }
+        .enter{
+            width:15%;
+            margin-left:0.5rem;
+        }
     }
     .simple_round {
         background: #d1d1d1 none repeat scroll 0 0;
@@ -137,19 +142,18 @@ page-chat {
         
     }
     .chat-box-single-line{
-        border-bottom: 1px solid #a4c6b5;
         margin: 7px 0 20px;
         position: relative;
         text-align: center;
-        height: 100%;
+        height: 85%;
         margin-top: 7rem;
         direct-chat-text{
             background: #dfece7 none repeat scroll 0 0;
             border: 1px solid #dfece7;
             border-radius: 2px;
             color: #1f2121;
-            width:30%;
-            left:60%;
+            width: 40%;
+            left: 43%;
             text-align: none;
         }
     }

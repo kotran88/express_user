@@ -4,26 +4,30 @@
 
 <ion-content class="main-view" padding>
   
-<div class="modal_content">
+<div class="modal_content" style="background:aliceblue">
     
-    <div class="header">배달 종료!!</div>
-    <hr>
+    <div class="header">배달이 종료되었습니다.</div>
+    <hr style="height: 1px;">
     <div class="content_main">
       <div class="image">
         <img src="{{foto}}"/>
       </div>
       <div class="info">
-          배달자 ID : {{id}}<br>
-          배달자 이름 : {{name}}<br>
+          <p style="margin-bottom:0.35rem;" class="label">배달자 ID</p>
+          {{id}}<br>
+          <p style="margin-bottom:0.35rem;" class="label">배달자 이름</p>
+          {{name}}<br>
       </div> 
     </div>
+    <hr style="height: 1px;">
     <div class="rating_header">
-      리뷰를 남겨주시면 이용자들에게 큰 도움이 됩니다.
+      배송은 만족스러우셨나요? 리뷰를 남겨주세요.
     </div>
     <ion-rating (ionClick)="log($event)"> </ion-rating>
     <div class="content_text">
-        <textarea name="review" placeholder="이곳에 리뷰를 남겨주세요" [(ngModel)]="text" id="" cols="45" rows="5" style="width:100%" class="review"></textarea>
+        <textarea name="review" placeholder="이곳에 리뷰를 남겨주세요" [(ngModel)]="text" id="" cols="45" rows="4" style="width:100%" class="review"></textarea>
     </div>
+    <hr style="height: 1px;">
     <div class="footer">
       <button class="confirm" ion-button (click)="review()">리뷰남기기</button>
       <button class="confirm" ion-button (click)="confirm()">리뷰안하기</button>

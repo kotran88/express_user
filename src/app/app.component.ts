@@ -1,6 +1,6 @@
 import { LoginPage } from './../pages/login/login';
 import { Component, ViewChild } from '@angular/core';
-import { Platform, Nav,ModalController } from 'ionic-angular';
+import { Platform, Nav,ModalController,Events } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -11,13 +11,14 @@ import { IonRatingComponent } from '../components/ion-rating/ion-rating';
 
 import { GooglePlus } from '@ionic-native/google-plus';
 import { NotifiedPage } from './../pages/notified/notified'
+import { StandbyPage} from './../pages/standby/standby'
 import { ViewRequestListPage } from './../pages/view-request-list/view-request-list';
 import { ViewRequestedAllPage } from './../pages/view-requested-all/view-requested-all';
 @Component({
   templateUrl: 'app.html'
 })
 export class MyApp {
-  rootPage:any = LoginPage;
+  rootPage:any = HomePage;
   imageUrl:any;
 
   id:any;
@@ -26,12 +27,29 @@ export class MyApp {
   activePage:any;
   @ViewChild(Nav) nav:Nav
   @ViewChild(GooglePlus) gp2:GooglePlus
-  constructor(public modal:ModalController,public http:Http,platform: Platform,statusBar: StatusBar, splashScreen: SplashScreen) {
+  constructor(public events: Events,public modal:ModalController,public http:Http,platform: Platform,statusBar: StatusBar, splashScreen: SplashScreen) {
     platform.ready().then(() => {
       
       statusBar.styleDefault();
       splashScreen.hide();
-     
+     if(platform.is('android')){
+      var one=window["plugins"].OneSignal
+      .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
+      one.handleNotificationOpened((jsonData)=> {
+               let value=jsonData.notification.payload.additionalData
+               if(value.status=="assigned"){
+                this.events.publish('status',value.status)
+                this.events.publish('itemObject',value.itemObject)
+               }else if(value.status=="finished"){
+                   alert("finished");
+               }else if(value.status=="chat"){
+                 this.events.publish('status',value.status);
+                 this.events.publish('itemObject',value.obejct);
+               }
+
+               })
+               .endInit();
+     }
      
       
     });

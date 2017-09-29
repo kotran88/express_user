@@ -14,31 +14,43 @@
 
 
 <ion-content padding>
-  
-  <ion-item>
-    <ion-label floating>사용하실 ID를 입력해주세요.</ion-label>
-    <ion-input [(ngModel)]="profile.id"></ion-input>
-    
-  </ion-item>
-  <button ion-button (click)="dupulicate()">중복검사</button>
-  <p *ngIf="start;else o">시작</p>
+  <p>첫 방문을 환영합니다.</p>
+  <p *ngIf="start;else o"></p>
   <ng-template #o><p *ngIf="dup;else other">중복입니다.</p></ng-template>
   
   <ng-template #other>사용 가능입니다.</ng-template>
 
-  ss
-  <div id="sign-in-button" class="sign-in-button"></div>
+  <ion-item style="width:70%; float:left">
+    <ion-label floating>사용하실 ID를 입력해주세요.</ion-label>
+    <ion-input [(ngModel)]="profile.id"> </ion-input>
+      
+    
+  </ion-item>
+  <button class="btn_right"  ion-button (click)="dupulicate()">중복검사</button>
+  
+  <ion-item>
+    <ion-label floating>이름을 입력해주세요.</ion-label>
+    <ion-input [(ngModel)]="profile.name"></ion-input>
+    
+  </ion-item>
+  
+  <div style="margin-bottom:2.5rem;"  class="phonecheck">
+            <ion-label style="margin-bottom:5rem;" floating>핸드폰 번호를 입력해주세요</ion-label>
+            
+          <ion-input class="phone"  type="text" name="pre" [(ngModel)]="pre"></ion-input>
+          <ion-input class="phone" style="margin-left:1rem;" type="text" name="line" [(ngModel)]="line"></ion-input>
+          <ion-input class="phone" style="margin-left:1rem;" type="text" name="line2" [(ngModel)]="line2"></ion-input>
+          
+  
+  </div>
+
+  <div  id="sign-in-button" class="sign-in-button"></div>
   <div *ngIf="windowRef.confirmationResult">
     <label for="code"> enter code here</label>
     <input type="text" name="code" [(ngModel)]="verificationCode">
     <button (click)="verifyLoginCode()"> Verify </button>
   </div>
-  <div class="phonecheck">
-    <input type="text" name="pre" [(ngModel)]="pre">
-    <input type="text" name="line" [(ngModel)]="line">
-    <input type="text" name="line2" [(ngModel)]="line2">
-  </div>
-    <button ion-button clear block (click)="checkPhone()">폰 체크</button>
-
+  <button style="margin-top:4rem;" ion-button clear block (click)="checkPhone()">폰 체크</button>
+  
    <button ion-button clear block (click)="createProfile()"> 가입완료 </button>
 </ion-content>

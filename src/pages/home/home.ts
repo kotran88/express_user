@@ -9,7 +9,7 @@ import { MapDirective } from './../../components/map';
 import { Observable, Subscription } from 'rxjs/Rx';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Component, ViewChild,OnInit,ChangeDetectionStrategy, OnChanges, Input,NgZone } from '@angular/core';
-import { NavController, ToastController, LoadingController, AlertController,NavParams, ModalController, Platform } from 'ionic-angular';
+import { NavController, ToastController, LoadingController, AlertController,Events,NavParams, ModalController, Platform } from 'ionic-angular';
 import {Keyboard} from '@ionic-native/keyboard';
 import firebase from 'firebase';
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -22,7 +22,8 @@ import {NotifiedPage} from './../notified/notified'
 import { Geolocation } from '@ionic-native/geolocation';
 import { RequestModalPage} from './../request-modal/request-modal';
 import { Favorite } from './../../components/models/favorite';
-
+import {FinishedPage} from './../finished/finished'
+import { ChatPage } from './../chat/chat';
 declare var google;
 @Component({
   changeDetection:ChangeDetectionStrategy.OnPush,
@@ -33,7 +34,8 @@ declare var google;
 })
 
 export class HomePage implements OnInit,OnChanges  {
-
+  mention_detail2:string;
+  point:number=0;
   countStart:number=0;
   tempStart:any;
   countEnd:number=0;
@@ -63,7 +65,7 @@ export class HomePage implements OnInit,OnChanges  {
   default:boolean=true;
   height:any="20%";
   showingByClickEnd:boolean=false;
-  mention:string="출발지/도착지를 선택해주세요";
+  mention:string="출발지/도착지를 입력해주세요";
   price:any=4500;
   showingMap:boolean=false;
   showingByClickStart:boolean=false;
@@ -144,26 +146,70 @@ export class HomePage implements OnInit,OnChanges  {
   uid:string;
   fetchingExpress:any;
   deliveryGuy:any;
-  constructor(public map:MapDirective, public keyboard:Keyboard,public toast:ToastController,public zone : NgZone,private alertCtrl: AlertController,public t:TimeService,public navCtrl: NavController,public navParam:NavParams , public modalCtrl:ModalController, public loading:LoadingController, 
+  constructor(public events:Events,public map:MapDirective, public keyboard:Keyboard,public toast:ToastController,public zone : NgZone,private alertCtrl: AlertController,public t:TimeService,public navCtrl: NavController,public navParam:NavParams , public modalCtrl:ModalController, public loading:LoadingController, 
     private geo:Geolocation,private afDatabase:AngularFireDatabase,public afAuth : AngularFireAuth,private googleplus:GooglePlus
   ,private oneSignal: OneSignal, public platform:Platform,private backgroundGeolocation: BackgroundGeolocation,public http:Http) {
-    var id=localStorage.getItem("id");
     this.uid=localStorage.getItem("uid");
-    this.phone=localStorage.getItem("phone");
-    this.imageUrl=localStorage.getItem("foto");
-    if(id!=undefined||id!=null){
-    this.userId=id;
-    }else{
-    this.userId="admin"
-    }
     if(this.uid==""||this.uid==undefined){
       this.uid="evCJcw2WnGWlwUcFVk1K1kHVQzJ2"
     }
+    var getFotos=this.afDatabase.list('profile/'+this.uid, { preserveSnapshot: true })
+    getFotos.subscribe(snapshots=>{
+      snapshots.forEach(element => {
+        console.log("element")
+        
+        if(element.key==="id"){
+            this.userId=element.val();
+            localStorage.setItem("id",this.userId)
+        }
+        
+        if(element.key==="phone"){
+          this.phone=element.val();
+        }
+        if(element.key==="foto"){
+          this.imageUrl=element.val();
+        }
 
+      });
+    })
     if(this.imageUrl==undefined){
       this.imageUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png"
     }
-     
+    if(this.phone==undefined){
+      this.phone="01079998598";
+    }
+    var getcurrentPoint=this.afDatabase.list('/profile/'+this.uid+'/point/', { preserveSnapshot: true })
+     getcurrentPoint.subscribe(snapshots=>{
+      snapshots.forEach((element)=>{
+        console.log(element.key);
+        if(element.key=="value"){
+          console.log(element.val())
+          this.point=element.val();
+        }
+      })
+     })
+      var d = new Date().getTime();
+      var aaa = 'xxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+            let today = new Date();
+        let dd:number;
+        let day:string;
+        let month:string;
+         dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+
+        var yyyy = today.getFullYear();
+       var time=new Date().toLocaleTimeString('en-US', { hour12: false,hour: "numeric",minute: "numeric"});
+       
+        dd<10?day='0'+dd:day=''+dd;
+        mm<10?month='0'+mm:month=''+mm;
+        let todayNoTime= yyyy+" "+mm+" "+dd;
+        let todayNoTime2=yyyy+'/'+month+'/'+day;
+      let todayWithTime = yyyy+'/'+month+'/'+day+' '+time;
+      
    
     this.it=this.afDatabase.list('/requestedList/requestedAll', { preserveSnapshot: true })
     this.it.subscribe(snapshots=>{
@@ -187,6 +233,10 @@ export class HomePage implements OnInit,OnChanges  {
 
   }
   getFavorite(element){
+    this.mention="";
+    this.mention_detail="";
+    this.mention_detail2="";
+    this.mapTopChanged=0;
     this.first_flag=false;
     this.result_flag=true;
     this.startDetail=element.startDetail;
@@ -198,41 +248,78 @@ export class HomePage implements OnInit,OnChanges  {
     this.showResult=true;
     this.default=true;
     this.calculatePrice(this.showndistance);
+    var startLocation=new google.maps.LatLng(element.startLat,element.startLng);
+    var endLocation=new google.maps.LatLng(element.endLat,element.endLng);
+    var lat_middle=(element.startLat+element.startLng)/2;
+    var lng_middle=(element.endLat+element.endLng)/2;
+    console.log(lat_middle);
+    console.log(lng_middle);
+    var location_middle=new google.maps.LatLng(lat_middle,lng_middle);
 
+    var param=[];
+    param.push(location_middle);
+    param.push(this.showndistance);
+    param.push(startLocation);
+    param.push(endLocation);
+    console.log(this.showndistance);
+    console.log(param);
+
+    this.panningToMiddle=!this.panningToMiddle;
+      this.panningLocation=param;
+      param=[];
   }
   mapIsCreated(value){
     if(value=="true"){
-      var notification=this.navParam.get("notification");
-      var notivalue=this.navParam.get("notificationValue");
-      var foto=this.navParam.get("foto");
-      var distance=this.navParam.get("distance");
-      if(notification!=undefined){
-        this.fetchingExpress=true;
-        this.deliveryGuy=notivalue;
-        this.panTodeliveryGuy="true";
-        this.items = this.afDatabase.list('/employees_status/Available/', { preserveSnapshot: true });
-        console.log('Hello SimulateProvider Provider');
-        this.items.subscribe(snapshots=>{
-            snapshots.forEach(element => {
-     
-              //특정유저로 한정시킨다. (여기서는 배송자 한사람에 대해서만 보여주면 되기에 한명으로 한정함. )
-              if(element.val().userid==this.deliveryGuy){
-                console.log("deliveryGuy is : "+this.deliveryGuy);
-                console.log("pushed");
-                this.deliverer_location={lat:element.val().lat,lng:element.val().lng}
-                console.log(element.val().lat+"!!!!"+element.val().lng);
-              }
-              
-              
-            });
-        })
-       // "id":this.userId,"foto":this.foto,"time": todaywithTime,"distance":distance
-       let modal = this.modalCtrl.create(NotifiedPage,{name:'정긍정',id:notivalue,foto:foto,distance:distance});
-       let me = this;
-       modal.onDidDismiss(data => {
-       });
-       modal.present();
-      }
+      var status=this.navParam.get("notification");
+      this.events.subscribe("status",value=>{
+        status=value;
+      })
+      var itemObject=this.navParam.get("itemObject");
+      this.events.subscribe("itemObject",value=>{
+        alert("!")
+        itemObject=value;
+      })
+      if(status!=undefined){
+        if(status=="assigned"){
+          this.fetchingExpress=true;
+          this.deliveryGuy=itemObject.deliveryGuy;
+          this.panTodeliveryGuy="true";
+          this.items = this.afDatabase.list('/employees_status/Available/', { preserveSnapshot: true });
+          console.log('Hello SimulateProvider Provider');
+          this.items.subscribe(snapshots=>{
+              snapshots.forEach(element => {
+       
+                //특정유저로 한정시킨다. (여기서는 배송자 한사람에 대해서만 보여주면 되기에 한명으로 한정함. )
+                if(element.val().userid==this.deliveryGuy){
+                  console.log("deliveryGuy is : "+this.deliveryGuy);
+                  console.log("pushed");
+                  this.deliverer_location={lat:element.val().lat,lng:element.val().lng}
+                  console.log(element.val().lat+"!!!!"+element.val().lng);
+                }
+                
+                
+              });
+          })
+         // "id":this.userId,"foto":this.foto,"time": todaywithTime,"distance":distance
+         let modal = this.modalCtrl.create(NotifiedPage,{name:'정긍정',id:itemObject.deliveryGuy,
+         foto:itemObject.messengerFoto,distance:itemObject.distance});
+         let me = this;
+         modal.onDidDismiss(data => {
+         });
+         modal.present();
+        }else if(status=="finished"){
+          let modal = this.modalCtrl.create(FinishedPage,{itemObject:itemObject});
+          let me = this;
+          modal.onDidDismiss(data => {
+          });
+          modal.present();
+        }else if(status=="chat"){
+          alert("chat come");
+          alert(itemObject);
+          this.navCtrl.push(ChatPage,{"object":itemObject})
+        }
+        }
+       
     }
   }
   ionViewDidLoad(){
@@ -414,6 +501,7 @@ export class HomePage implements OnInit,OnChanges  {
         this.default=true;
         this.onlymap=true;
       }else{
+        this.mapTopChanged=10;
         this.first_flag=true;
         this.result_flag=false;
         this.showResult=false;
@@ -611,13 +699,19 @@ export class HomePage implements OnInit,OnChanges  {
             }
           }
         }
-        if(this.endPoint==undefined||this.endPoint==""){
-          this.mention="도착지를 선택해주세요";
-          if(this.startPoint!=undefined||this.startPoint!=""){
-
-            this.mention_detail="픽업지 : "+this.startPoint+"입니다."
+        if(this.changeMarker=="default"){
+          this.mention_detail2="";
+        }else{
+          if(this.endPoint==undefined||this.endPoint==""){
+            this.mention="도착지를 선택해주세요";
+            if(this.startPoint!=undefined||this.startPoint!=""){
+  
+              this.mention_detail="픽업지 : "+this.startPoint+"입니다. "
+              this.mention_detail2="지도를 드래그하여, 목적지를 변경할 수 있습니다. ";
+            }
           }
         }
+        
         this.changeMarker="startMarker";
 
       }else if(v.flag=="endMarker"){
@@ -632,8 +726,8 @@ export class HomePage implements OnInit,OnChanges  {
           this.tempEnd=v.address;
           if(this.endPoint!=undefined||this.endPoint!=""){
             console.log("setting")
-            this.mention_detail="도착2 : "+this.endPoint+"입니다."
-         
+            this.mention_detail="도착지 : "+this.endPoint+"입니다."
+            this.mention_detail2="지도를 드래그하여, 목적지를 변경할 수 있습니다. "
         }
         }else{
           this.endPoint=v.address;
@@ -704,7 +798,7 @@ export class HomePage implements OnInit,OnChanges  {
         // this.showingDetailEnd=true;
         console.log(this.startPoint);
         if(this.startPoint==""){
-        
+          this.mention_detail2="신청하기 버튼을 눌러주세요";
           console.log("출발지를 선택해주세요")
           this.first_flag=true;
           this.result_flag=false;
@@ -1219,7 +1313,7 @@ export class HomePage implements OnInit,OnChanges  {
         var loc={startlat:this.slat,startlng:this.slng,endlat:this.elat,endlng:this.elng}
        console.log(loc);
       this.navCtrl.push(RequestModalPage,{start: this.startPoint   , end: this.endPoint, 
-        startDetail:this.startDetail,endDetail:this.endDetail,dis:this.distance,
+        startDetail:this.startDetail,endDetail:this.endDetail,dis:this.distance,phone:this.phone,
         favorite_list:this.favorite_information,location:loc,totalNumber:this.totalNumber,price:this.price,uid:this.uid});
       
 //       var sp=this.startPoint;
@@ -1382,14 +1476,30 @@ export class HomePage implements OnInit,OnChanges  {
   dragging(value){
     this.showingFavoriteAttribue=false;
     console.log(value);
+    console.log("?????")
     console.log(this.startPoint+","+this.endPoint);
     this.showFavorite=true;
     
     this.zone.run(()=>{
       
       if(value){
+        if(this.changeMarker=="startMarker"){
+          this.showNext=false;
+        }else if(this.changeMarker=="endMarker"){
+          this.showNextEnd=false;
+        }
+        console.log("!!!!!")
+       
         
-        this.onlymap=false;
+        if(this.changeMarker=="default"){
+          this.showingFavoriteAttribue=false;
+          this.onlymap=false;
+        }else{
+          this.mention="지도를 드래그하여 목적지를 선택해주세요"
+          this.showingFavoriteAttribue=true;
+          this.onlymap=true;
+        }
+       
         this.first_flag=false;
         this.result_flag=false;
         
@@ -1398,13 +1508,20 @@ export class HomePage implements OnInit,OnChanges  {
         this.showSoloMap=true;
     
       }else{
+        if(this.changeMarker=="startMarker"){
+          this.showNext=true;
+        }else if(this.changeMarker=="endMarker"){
+          this.showNextEnd=true;
+        }
         console.log("mouse up")
-
+        
         if(this.changeMarker=="endMarker"){
+          this.mention="다시 드래그를 하여 목적지를 바꿀수있습니다2."
           console.log("go end")
           this.showNextEnd=true;
           this.onlymap=true;
         }else if(this.changeMarker=="startMarker"){
+          this.mention="다시 드래그를 하여 목적지를 바꿀수있습니다2."
           console.log("go start");
           this.showNext=true;
           console.log(this.showNext);
@@ -1556,7 +1673,7 @@ export class HomePage implements OnInit,OnChanges  {
     this.geoCode=true;
   }
   goToMyList(){
-    this.navCtrl.push(ViewRequestListPage)
+    this.navCtrl.push(ViewRequestListPage,{"uid":this.uid})
   }
   tapEvent(event){
     console.log(event);

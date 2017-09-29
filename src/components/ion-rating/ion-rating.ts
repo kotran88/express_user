@@ -12,7 +12,7 @@ import { Component, Input, Output, EventEmitter} from '@angular/core';
 })
 export class IonRatingComponent {
   @Input() numStars:number=5;
-  @Input() value:number=2.5;
+  @Input() value:number=5;
   @Output() ionClick:EventEmitter<number> = new EventEmitter<number>();
 
   stars:string[]=[];

@@ -70,7 +70,6 @@ export class ProfilePage {
              
           
          });
-         alert(this.dup+","+this.nodup);
         
 
         });
@@ -83,13 +82,9 @@ export class ProfilePage {
   }
   ionViewDidLoad() {
     console.log('ionViewDidLoad ProfilePage');
-    if(this.second){
-
-    }else{
 
       this.windowRef.RecaptchaVerifier= new firebase.auth.RecaptchaVerifier('sign-in-button')
       this.windowRef.RecaptchaVerifier.render()
-    }
   }
   verifyLoginCode(){
     this.windowRef.confirmationResult.confirm(this.verificationCode).then(result=>{
@@ -108,9 +103,6 @@ export class ProfilePage {
     }else{
       const appVerifier=this.windowRef.RecaptchaVerifier;
       var a=appVerifier.verify()
-      console.log(a);
-      console.log("appVerifier");
-      console.log(appVerifier);
       this.phoneNumber.country="82"
       this.phoneNumber.area=this.pre
       this.phoneNumber.prefix=this.line
@@ -118,10 +110,8 @@ export class ProfilePage {
       this.phone_final=this.pre+"-"+this.line+"-"+this.line2;
       const num=this.phoneNumber.e164;
       const re=firebase.auth().signInWithPhoneNumber(num,appVerifier).then(result=>{
-        alert(result);
         this.windowRef.confirmationResult=result;
       }).catch(error=>{
-        alert("error : "+error);
       })
     }
     
@@ -141,24 +131,28 @@ export class ProfilePage {
       dd<10?day='0'+dd:day=''+dd;
       mm<10?month='0'+mm:month=''+mm;
       let todayWithTime = yyyy+'/'+month+'/'+day+' '+time;
+      this.phone_final=this.pre+"-"+this.line+"-"+this.line2;
       if(this.phone_final==undefined||this.phone_final==""){
         this.phone_final="010-7999-8598"
       }
       
       this.profile.email=this.email;
       this.profile.phone=this.phone_final;
-      this.profile.name="정긍정"
+      if(this.profile.name==""||this.profile.name==undefined){
+
+        this.profile.name="정긍정"
+      }
       this.profile.type="고객";
       this.profile.created_date=todayWithTime
       this.profile.foto=localStorage.getItem("foto");
       this.afDatabase.object('profile/'+auth.uid+'/').set(this.profile)
       localStorage.setItem("id",this.profile.id);
-      alert("가입이 완료되었습니다.")
-      this.afDatabase.list("profile/"+auth.uid+"/point").push({created:todayWithTime}).then(()=>{
-        alert("s")
+      this.afDatabase.object("profile/"+auth.uid+"/point").set({value:500});
+      this.afDatabase.list("profile/"+auth.uid+"/point").push({value:500,created:todayWithTime}).then(()=>{
+        alert("가입이 완료되었습니다.")
+        this.navCtrl.setRoot(HomePage);
             }).catch((error)=>{
             });
-      this.navCtrl.setRoot(HomePage);
     })
   }
 }

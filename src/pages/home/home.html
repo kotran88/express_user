@@ -43,11 +43,11 @@
             <ion-col width-100> 
               <ion-searchbar  style="padding:6px;" #searchBar placeholder="출발지를 입력해주세요"  [(ngModel)]="startPoint" clearInput>{{startPoint}}</ion-searchbar>
               <ion-list [style.width.px]="width_style" class="pastList" *ngIf=showMyStart>
-                <ion-item>
+                <ion-item style="height: 2.5rem; min-height: 0;">
                     <p style="float:left">최근 검색어 </p> <p style="float:right"><button (click)="closePast('start')"><ion-icon name="close"></ion-icon></button>
                     </p>
                   </ion-item>
-                <ion-item tappable   (click)="chooseItem(i)" *ngFor="let i of myStart">
+                <ion-item style="height: 2.5rem; min-height: 0;" tappable   (click)="chooseItem(i)" *ngFor="let i of myStart">
                   <p style="float:left">{{i.place}} </p> <p style="float:right"> {{i.searchedTime}}</p>
                 </ion-item>
               </ion-list>
@@ -68,11 +68,11 @@
              <ion-col width-100>
                   <ion-searchbar style="padding:6px;" #searchBar_end placeholder="도착지를 입력해주세요"  [(ngModel)]="endPoint"  clearInput>{{endPoint}}</ion-searchbar>
                   <ion-list [style.width.px]="width_style" class="pastList" *ngIf=showMyEnd>
-                      <ion-item>
+                      <ion-item style="height: 2.5rem; min-height: 0;">
                           <p style="float:left">최근 검색어 </p> <p style="float:right"><button (click)="closePast('end')"><ion-icon name="close"></ion-icon></button>
                           </p>
                         </ion-item>
-                      <ion-item tappable   (click)="chooseItem_end(i)" *ngFor="let i of myEnd">
+                      <ion-item style="height: 2.5rem; min-height: 0;" tappable   (click)="chooseItem_end(i)" *ngFor="let i of myEnd">
                           <p style="float:left">{{i.place}} </p> <p style="float:right">{{i.searchedTime}}</p>
                       </ion-item>
                     </ion-list>
@@ -183,17 +183,19 @@
         </ion-row>
   </div> -->
   
-  <div [style.top.em]="mapTopChanged" [ngClass]="showSoloMap ? 'show_full':'map-wrapper'">
+  <div [style.top.%]="mapTopChanged" [ngClass]="showSoloMap ? 'show_full':'map-wrapper'">
     <map (mapIsCreated)=mapIsCreated($event) [resetEnddd]="resetEnddd"[resetStarttt]="resetStarttt" (dragging)=dragging($event) [panningToMiddle]="panningToMiddle" [panningLocation]="panningLocation" (full_address)="full_address($event)" [makeMarkerInformation]="makeMarkerInformation" [makeMarker]="makeMarker" (end)=my_end($event) (start)=my_start($event) (count)=my_count($event) (favorite)=favorite_list_shown($event) [resetEndd]="resetEndd" [resetStartt]="resetStartt" [resetStart]="resetStart" [resetEnd]="resetEnd" [resetAll]="resetAll" [changeMarker]="changeMarker" (notifyingChange)="notifyingChange($event)" [deliverer_location]="deliverer_location" [panTodeliveryGuy]="panTodeliveryGuy" [fetchingExpress]="fetchingExpress" [deliveryGuy]="deliveryGuy" (new_address)="new_address($event)"  (sLat)="sLat($event)" (sLng)="sLng($event)" (eLat)="eLat($event)" (eLng)="eLng($event)" (startLocation)="startLocation($event)" (endLocation)="endLocation($event)" #map [isPickupRequested]="isPickupRequested"  [startLat]="startLat" [startLng]="startLng" [endLat]="endLat" [requested]="requested" [endLng]="endLng"></map>
   </div>
   
   <div  *ngIf="showNext"  class="selectingDetail">
       <p [ngClass]="showFavorite ? 'dragging_mention':'show_mention'">{{mention_detail}}</p>
+      <p [ngClass]="showFavorite ? 'dragging_mention2':'show_mention2'">{{mention_detail2}}</p>
       <ion-searchbar class="search_bottom" style="padding:6px;" #searchBar placeholder="픽업 상세주소를 입력해주세요.예)문투문 사옥 45층"  [(ngModel)]="startDetail" clearInput></ion-searchbar>
       <button class="showNext" ion-button  (click)="showNextClick('start')">이 주소가 확실합니다! 다음으로</button>
   </div>
   <div  *ngIf="showNextEnd"  class="selectingDetail">
       <p [ngClass]="showFavorite ? 'dragging_mention':'show_mention'">{{mention_detail}}</p>
+      <p [ngClass]="showFavorite ? 'dragging_mention2':'show_mention2'">{{mention_detail2}}</p>
       <ion-searchbar  class="search_bottom" style="padding:6px;" #searchBar placeholder="도착지 상세주소를 입력해주세요.예)문투문 사옥 45층"  [(ngModel)]="endDetail" clearInput></ion-searchbar>
       <button class="showNext" ion-button  (click)="showNextClick('end')">이 주소가 확실합니다! 다음으로</button>
     </div>
@@ -230,6 +232,8 @@
                 <img class="img" src="{{imageUrl}}"/>
                 <p>{{userId}}</p>
                 <p>{{phone}}</p>
+                <p>포인트 : {{point}}</p>
+                
             </div>
             
               <button menuClose ion-item *ngFor="let p of pages" [class.activeHighlight]="checkActive(p)" (click)="openPage(p)">{{p.title}}</button>

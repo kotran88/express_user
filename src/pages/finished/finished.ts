@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams,ViewController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import {review } from './../../components/models/review'
+import { Subscription } from 'rxjs/Subscription';
 
 import { request } from './../../components/models/request';
 /**
@@ -15,8 +16,10 @@ import { request } from './../../components/models/request';
   templateUrl: 'finished.html',
 })
 export class FinishedPage {
+  mileage:number;
   request={} as request;
   reviews={} as review;
+  messengeruid:string;
   id:string;
   time:string;
   foto:string;
@@ -25,25 +28,44 @@ export class FinishedPage {
   orderNo:string;
   rating:string="5";
   itemObject:any;
+  reviewer:any;
+  todayWithTime:any;
+  name:string;
+  unsubscriber: Subscription = new Subscription();
   constructor(public viewCtrl:ViewController ,public afDatabase: AngularFireDatabase, public navCtrl: NavController, public navParams: NavParams) {
+  
+    let today = new Date();
+    let dd:number;
+    let day:string;
+    let month:string;
+     dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+
+    var yyyy = today.getFullYear();
+   var time=new Date().toLocaleTimeString('en-US', { hour12: false,hour: "numeric",minute: "numeric"});
+   
+    dd<10?day='0'+dd:day=''+dd;
+    mm<10?month='0'+mm:month=''+mm;
+    let todayNoTime= yyyy+" "+mm+" "+dd;
+    let todayNoTime2=yyyy+'/'+month+'/'+day;
+  this.todayWithTime = yyyy+'/'+month+'/'+day+' '+time;
   }
 
   ionViewWillEnter() {
-    this.id = this.navParams.get('id');
-    this.time=this.navParams.get("time")
-    this.foto=this.navParams.get("foto")
-    this.uid=this.navParams.get("uid");
-    this.orderNo=this.navParams.get("orderNo")
     this.itemObject=this.navParams.get("itemObject");
+    console.log(this.itemObject);
+    this.foto=this.itemObject.messengerFoto;
+    console.log(this.itemObject)
+    this.messengeruid=this.itemObject.messengeruid;
+    this.uid=this.itemObject.senderuid;
+    this.orderNo=this.itemObject.orderNo;
+    this.name=this.itemObject.messengerName;
+    this.id=this.itemObject.deliveryGuy;
+    this.reviewer=this.itemObject.user;
     if(this.uid==undefined){
-      this.uid="zUjzGdNOa8ZUAFHvQFQgKhEbEoe2"
+      this.uid="evCJcw2WnGWlwUcFVk1K1kHVQzJ2"
     }
-    if(this.orderNo==undefined){
-      this.orderNo="2017082100000"
-    }
-    if(this.id==undefined||this.id==null){
-      this.id="haha"
-    }
+    
   }
   confirm(){
     this.viewCtrl.dismiss();
@@ -53,15 +75,43 @@ export class FinishedPage {
     this.rating=value;
   }
   review(){
+    this.reviews.reviewer=this.reviewer;
+    this.reviews.created_date=this.todayWithTime;
     this.reviews.content=this.text;
     this.reviews.rating=this.rating;
     this.request=this.itemObject;
-    this.afDatabase.object('profile/'+this.uid+'/finished/'+this.orderNo).set(this.reviews)
+    this.request.status="finished_review";
+    console.log(this.reviews);
+    this.afDatabase.object('profile/'+this.messengeruid+'/finished/'+this.orderNo).set(this.reviews)
     this.request.rating=this.rating;
-    this.request
-    this.afDatabase.object('/requestedList/requestedAll/'+this.itemObject.orderNo).set(this.request);
-
-    
+    this.request.rating_content=this.text;
+    console.log(this.request);
+    this.afDatabase.object('/requestedList/requested/'+this.orderNo).remove();
+    this.afDatabase.object('/requestedList/requestedAll/'+this.orderNo).set(this.request);
+      this.mileage=parseInt(this.request.distance)*1000*0.1
+      console.log(this.mileage);
+      console.log(this.uid);
+      var getcurrentPoint=this.afDatabase.list('/profile/'+this.uid+'/point/', { preserveSnapshot: true })
+       this.unsubscriber=getcurrentPoint.subscribe(snapshots=>{
+           console.log("len"+snapshots.length);
+        snapshots.forEach(element => {
+            console.log(element.key);
+            if(element.key=="value"){
+               var currentPoint=element.val();
+                console.log("point:"+element.val());
+                this.unsubscriber.unsubscribe();
+                var pointt=this.afDatabase.object('profile/'+this.uid+'/point/')
+                pointt.update({
+                    value:(currentPoint+this.mileage)
+                }).then(()=>{
+                    var pointInsert=this.afDatabase.list("profile/"+this.uid+"/point").push({created:this.todayWithTime,valueAdded:this.mileage}).then(()=>{
+                   }).catch((error)=>{
+                   });
+                    return;
+                })
+            }
+           })
+       });
   }
   goBack(){
       this.viewCtrl.dismiss();

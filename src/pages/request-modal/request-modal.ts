@@ -16,15 +16,17 @@ import { Subscription } from 'rxjs/Subscription';
   templateUrl: 'request-modal.html',
 })
 export class RequestModalPage implements OnInit {
-
-
-  pointtouse:any;
+  couponkey:string;
+  coupon_flag:string;
+  couponvalue:string=""
+  pointtouse:number=0;
   pointAll:any;
+  tounsubscribe:Subscription = new Subscription();
   unsubscriber: Subscription = new Subscription();
   checked:any;
   app_payment:boolean=false;
-  final_price:any=10000;
-  coupon:boolean=false;
+  final_price:number;
+  coupon:boolean=true;
   start_detail:any;
   end_detail:any;
   cellphone:any;
@@ -33,7 +35,7 @@ export class RequestModalPage implements OnInit {
   freight:boolean=true;
   mileage:any;
   discount_price:any;
-  discount:boolean=false;
+  discount:boolean=true;
   payment:boolean=false;
   flag_payment_mean:boolean=false;
   flag_payment_info:boolean=false;
@@ -66,6 +68,7 @@ export class RequestModalPage implements OnInit {
   startDetail:string;
   uid:string;
   point:number;
+  phone:string;
   constructor(public alertCtrl:AlertController,public viewCtrl:ViewController ,public modalCtrl:ModalController,public navCtrl: NavController,public platform:Platform,public afDatabase:AngularFireDatabase, public navParams: NavParams) {
     this.desiredTime="ASAP"
     let today = new Date();
@@ -75,9 +78,12 @@ export class RequestModalPage implements OnInit {
      dd = today.getDate();
     var mm = today.getMonth()+1; //January is 0!
     this.price=this.navParams.get("price");
+    this.final_price=this.price
     this.endDetail=this.navParams.get("endDetail");
     this.startDetail=this.navParams.get("startDetail");
     this.uid=this.navParams.get("uid");
+    this.phone=this.navParams.get("phone");
+    this.cellphone=this.phone;
     console.log(this.startDetail);
     var yyyy = today.getFullYear();
    var time=new Date().toLocaleTimeString('en-US', { hour12: false,hour: "numeric",minute: "numeric"});
@@ -125,55 +131,54 @@ export class RequestModalPage implements OnInit {
     var list=[];
     for(var i=0; i<this.favorite_list.length; i++){
       list.push({type:'radio',label:this.favorite_list[i].title,value:i})
-    } 
-
-let prompt = this.alertCtrl.create({
-title: '즐겨찾기',
-message: '즐겨찾기로 추가한 주소중 고를 수 있습니다. ',
-inputs : list,
-buttons : [
- {
-   text: "Cancel",
-   handler: data => {
-     console.log("cancel clicked");
-   }
- },
- {
-   text: "Search",
-   handler: data => {
-     console.log("search clicked");
-     console.log(data);
-     console.log(this.favorite_list[data])
-     var favorite=this.favorite_list[data];
-     this.start=favorite.startPoint;
-     this.end=favorite.endPoint;
-     this.startDetail=favorite.startDetail;
-     this.endDetail=favorite.endDetail;
-     this.location.startlat=favorite.startLat;
-     this.location.startlng=favorite.startLng;
-     this.location.endlat=favorite.endLat;
-     this.location.endlng=favorite.endLng;
-   }
- }
-]
-});
-    prompt.present();
-
-  }
-  add(value){
-    if(value=="start"){
-     
-    }else{
-     
     }
+    if(this.favorite_list.length==0){
+
+    }else{
+      let prompt = this.alertCtrl.create({
+        title: '즐겨찾기',
+        message: '즐겨찾기한 주소중 고를 수 있습니다. ',
+        inputs : list,
+        buttons : [
+         {
+           text: "취소",
+           handler: data => {
+             console.log("cancel clicked");
+           }
+         },
+         {
+           text: "다음",
+           handler: data => {
+             console.log("search clicked");
+             console.log(data);
+             console.log(this.favorite_list[data])
+             var favorite=this.favorite_list[data];
+             this.start=favorite.startPoint;
+             this.end=favorite.endPoint;
+             this.startDetail=favorite.startDetail;
+             this.endDetail=favorite.endDetail;
+             this.location.startlat=favorite.startLat;
+             this.location.startlng=favorite.startLng;
+             this.location.endlat=favorite.endLat;
+             this.location.endlng=favorite.endLng;
+           }
+         }
+        ]
+        });
+            prompt.present();
+    }
+    console.log(list)
+
+
+
   }
+
   ngOnInit(){
     var currentPoint=0;
     var getcurrentPoint=this.afDatabase.list('/profile/'+this.uid+'/point/', { preserveSnapshot: true })
     this.unsubscriber=getcurrentPoint.subscribe(snapshots=>{
       snapshots.forEach(element=>{
         if(element.key=="value"){
-
           this.point=element.val();
         }
 
@@ -208,42 +213,98 @@ buttons : [
   ionViewDidLoad() {
     console.log('ionViewDidLoad RequestModalPage');
   }
-  confirm(){
-        console.log(this.checked);
-        if(this.checked){
-          this.orderNo=this.todate+this.totalNumber
-          if(this.request_text==undefined){
-            this.request_text="none"
-          }
-          this.request.distance=this.distance+"";
-          this.request.endLat=this.location.endlat;
-          this.request.endLng=this.location.endlng;
-          this.request.startLat=this.location.startlat;
-          this.request.startLng=this.location.startlng;
+  usePoint(){
+    console.log(this.pointtouse);
+    console.log(this.final_price);
 
-          this.request.user=this.userId;
-          this.request.create_date=this.todayWithTime;
-          this.request.status="requested";
-          this.request.startPoint=this.start;
-          this.request.endPoint=this.end;
-          this.request.onlyDate=this.todayNoTime;
-          
-          this.request.type=this.type;
-          this.request.desired_time=this.desiredTime;
-          this.request.request_text=this.request_text;
-          this.request.orderNo=this.orderNo;
-          this.request.startDetail=this.startDetail;
-          this.request.endDetail=this.endDetail;
-          this.request.senderuid=this.uid;
+  }
+  confirm(){
+    console.log(this.checked);
+    if(this.checked){
+      this.orderNo=this.todate+this.totalNumber
+      if(this.request_text==undefined){
+        this.request_text="none"
+      }
+      this.request.distance=this.distance+"";
+      this.request.endLat=this.location.endlat;
+      this.request.endLng=this.location.endlng;
+      this.request.startLat=this.location.startlat;
+      this.request.startLng=this.location.startlng;
+
+      this.request.user=this.userId;
+      this.request.create_date=this.todayWithTime;
+      this.request.status="requested";
+      this.request.startPoint=this.start;
+      this.request.endPoint=this.end;
+      this.request.onlyDate=this.todayNoTime;
+      
+      this.request.type=this.type;
+      this.request.desired_time=this.desiredTime;
+      this.request.request_text=this.request_text;
+      this.request.orderNo=this.orderNo;
+      this.request.startDetail=this.startDetail;
+      this.request.endDetail=this.endDetail;
+      this.request.senderuid=this.uid;
+      this.request.phone=this.cellphone;
+      
+      //쿠폰/ 포인트를 소모할경우 - 처리한다.
+      var currentPoint=0;
+      if(this.couponvalue!=""){
+       var couponuse=this.afDatabase.object('coupon/'+this.couponkey)
+       couponuse.update({
+         flag:"unavailable",
+         used_date:"2017/01/01"
+       }).then(()=>{
+         this.final_price=0;
+          }).catch((error)=>{
+          });
+      }
+      if(this.pointtouse!=0){
+       var getcurrentPoint=this.afDatabase.list('/profile/'+this.uid+'/point/', { preserveSnapshot: true })
+       this.unsubscriber=getcurrentPoint.subscribe(snapshots=>{
+           console.log("len"+snapshots.length);
+        snapshots.forEach(element => {
+            console.log(element.key);
+            if(element.key=="value"){
+               currentPoint=element.val();
+                console.log("point:"+element.val());
+                this.unsubscriber.unsubscribe();
+                var pointt=this.afDatabase.object('profile/'+this.uid+'/point/')
+                pointt.update({
+                    value:(currentPoint-this.pointtouse)
+                }).then(()=>{
+                    var pointInsert=this.afDatabase.list("profile/"+this.uid+"/point").push({created:this.todayWithTime,valueAdded:this.mileage}).then(()=>{
+                   }).catch((error)=>{
+                   });
+                    return;
+                })
+            }
+           })
+       });
+      }
+
           if(this.platform.is('android')){
               window["plugins"].OneSignal.getIds((idx)=>{
-                alert("idx.userId"+idx.userId)
                this.request.tokenId=idx.userId
+
+               var currentPoint=0;
+               if(this.couponvalue!=""){
+                var couponuse=this.afDatabase.object('coupon/'+this.couponkey)
+                couponuse.update({
+                  flag:"unavailable",
+                  used_date:"2017/01/01"
+                }).then(()=>{
+                  this.final_price=0;
+                   }).catch((error)=>{
+                   });
+               }
+
+
                this.afDatabase.object('/requestedList/requestedAll/'+this.orderNo).set(this.request).then((suc)=>{
                 this.afDatabase.object('/requestedList/requested/'+this.orderNo).set(this.request).then((success)=>{
                   alert("신청이 완료되었습니다. for android")
-                  
-                  this.viewCtrl.dismiss();
+
+                  this.navCtrl.push(StandbyPage,{pickuplocation:this.start,pickuplat:this.location.startlat,pickuplng:this.location.startlng})
               }).catch((error)=>{
                 alert(error)
               })
@@ -254,7 +315,18 @@ buttons : [
            })
             })
             }else if(this.platform.is('ios')){
-              window["plugins"].OneSignal.getIds((idx)=>{
+              var iosSettings = {};
+              iosSettings["kOSSettingsKeyAutoPrompt"] = true;
+              iosSettings["kOSSettingsKeyInAppLaunchURL"] = false;
+      
+              // Initialize
+    
+              var one=window["plugins"].OneSignal
+              .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
+              
+              one.iOSSettings(iosSettings)
+              .endInit();
+              one.getIds((idx)=>{
                 this.request.tokenId=idx.userId
                 this.afDatabase.object('/requestedList/requestedAll/'+this.orderNo).set(this.request).then((suc)=>{
                   this.afDatabase.object('/requestedList/requested/'+this.orderNo).set(this.request).then((success)=>{
@@ -265,55 +337,109 @@ buttons : [
                 }).catch((error)=>{
                   alert(error);
                 })
-                }).catch((error)=>{
-                 alert(error)
-               })
+                })
                
              }).catch((error)=>{
-               alert(error);
+               alert(JSON.stringify(error));
              })
             }else{
               console.log(this.request);
               var currentPoint=0;
-              var getcurrentPoint=this.afDatabase.list('/profile/'+this.uid+'/point/', { preserveSnapshot: true })
-              this.unsubscriber=getcurrentPoint.subscribe(snapshots=>{
-                  console.log("len"+snapshots.length);
-               snapshots.forEach(element => {
-                   console.log(element.key);
-                   if(element.key=="value"){
-                      currentPoint=element.val();
-                       console.log("point:"+element.val());
-                       this.unsubscriber.unsubscribe();
-                       var pointt=this.afDatabase.object('profile/'+this.uid+'/point/')
-                       pointt.update({
-                           value:(currentPoint+this.mileage)
-                       }).then(()=>{
-                           var pointInsert=this.afDatabase.list("profile/"+this.uid+"/point").push({created:this.todayWithTime,valueAdded:this.mileage}).then(()=>{
-                          }).catch((error)=>{
-                          });
-                           return;
-                       })
-      
-                       
-                   }
-                  })
-              });
-            //   this.afDatabase.object('/requestedList/requestedAll/'+this.orderNo).set(this.request).then((suc)=>{
-            //     this.afDatabase.object('/requestedList/requested/'+this.orderNo).set(this.request).then((success)=>{
-            //       alert("신청이 완료되었습니다 for window.")
-            //       this.navCtrl.push(StandbyPage)
+              if(this.couponvalue!=""){
+               var couponuse=this.afDatabase.object('coupon/'+this.couponkey)
+               couponuse.update({
+                 flag:"unavailable",
+                 used_date:"2017/01/01"
+               }).then(()=>{
+                 this.final_price=0;
+                  }).catch((error)=>{
+                  });
+              }
+              // if(this.pointtouse!=0){
+              //  var getcurrentPoint=this.afDatabase.list('/profile/'+this.uid+'/point/', { preserveSnapshot: true })
+              //  this.unsubscriber=getcurrentPoint.subscribe(snapshots=>{
+              //      console.log("len"+snapshots.length);
+              //   snapshots.forEach(element => {
+              //       console.log(element.key);
+              //       if(element.key=="value"){
+              //          currentPoint=element.val();
+              //           console.log("point:"+element.val());
+              //           this.unsubscriber.unsubscribe();
+              //           var pointt=this.afDatabase.object('profile/'+this.uid+'/point/')
+              //           pointt.update({
+              //               value:(currentPoint+this.mileage)
+              //           }).then(()=>{
+              //               var pointInsert=this.afDatabase.list("profile/"+this.uid+"/point").push({created:this.todayWithTime,valueAdded:this.mileage}).then(()=>{
+              //              }).catch((error)=>{
+              //              });
+              //               return;
+              //           })
+              //       }
+              //      })
+              //  });
+              // }
+
+              this.afDatabase.object('/requestedList/requestedAll/'+this.orderNo).set(this.request).then((suc)=>{
+                this.afDatabase.object('/requestedList/requested/'+this.orderNo).set(this.request).then((success)=>{
+                  alert("신청이 완료되었습니다 for window.")
+                  console.log(this.start+","+this.location.slat+",,"+this.location.slng);
+                  this.navCtrl.push(StandbyPage,{pickuplocation:this.start,pickuplat:this.location.slat,pickuplng:this.location.slng})
                   
-            //   }).catch((error)=>{
-            //     alert(error);
-            //   })
-            //   }).catch((error)=>{
-            //    alert(error)
-            //  })
+              }).catch((error)=>{
+                alert(error);
+              })
+              }).catch((error)=>{
+               alert(error)
+             })
             }
         }else{
           alert("개인정보 동의해주세요")
         }
           
+  }
+  useCoupon(coupon){
+    console.log(this.couponvalue);
+    var couponflag;
+    var matched="false"
+    var items=this.afDatabase.list('/coupon', { preserveSnapshot: true })
+    this.tounsubscribe=items.subscribe(snapshots=>{
+   
+        
+     snapshots.forEach(element => {
+         if(element.val().value==coupon){
+           if(element.val().flag!="available"){
+              matched="duplicated";
+           }else{
+            this.couponkey=element.key
+            couponflag=true;
+            console.log("matched")
+            matched="true";
+            this.tounsubscribe.unsubscribe();
+           
+           }
+         
+        }else{
+          console.log("fail")
+          couponflag="nofound"
+        }
+        
+     })
+     console.log(matched);
+     console.log("result")
+     if(matched=="true"){
+      console.log("매치완료")
+      this.mileage=0;
+      this.pointtouse=0;
+      this.coupon_flag="전액무료쿠폰"
+      this.final_price=0;
+
+     }else if(matched=="duplicated"){
+       console.log("중복!")
+     }else{
+      console.log("일치하는 쿠폰을 찾을수없습니다")
+     }
+  
+    })
   }
   toggle(value){
     switch (value) {

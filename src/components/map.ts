@@ -389,8 +389,38 @@ console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
                 console.log(this.startMarker[i].position.lat())
                 console.log(this.startMarker[i].position.lng())
             }
-            var loc=new google.maps.LatLng(this.startMarker[this.startMarker.length-1].position.lat(),this.startMarker[this.startMarker.length-1].position.lng())
-            var loc2=new google.maps.LatLng(this.endMarker[this.endMarker.length-1].position.lat(),this.endMarker[this.endMarker.length-1].position.lng())
+
+            if(this.panningLocation.length>1){
+                //즐겨찾기 인경우에 3,4번째 패러미터로 startLocation endLocation좌표가 넘어옴
+                var startMarker=new google.maps.Marker({
+                    map : this.map,
+                    position:this.panningLocation[2],
+                    icon:'assets/icon/start2.png'
+                })
+          
+                this.startMarker.push(startMarker);
+
+                var endMarker=new google.maps.Marker({
+                    map : this.map,
+                    position:this.panningLocation[3],
+                    icon:'assets/icon/end.png'
+                })
+          
+                this.endMarker.push(endMarker);
+            }
+            console.log(this.startMarker);
+            console.log(this.startMarker.length);
+            console.log(this.endMarker);
+            console.log(this.endMarker.length);
+            for(var i=0; i<this.startMarker.length; i++){
+                console.log(i+"q")
+                console.log(this.startMarker[i].position);
+                console.log(this.endMarker[i].position)
+            }
+            var loc=new google.maps.LatLng(this.startMarker[0].position.lat(),this.startMarker[0].position.lng())
+            var loc2=new google.maps.LatLng(this.endMarker[0].position.lat(),this.endMarker[0].position.lng())
+
+
             bounds.extend(loc);
             bounds.extend(loc2)
             console.log(bounds);

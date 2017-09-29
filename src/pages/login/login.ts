@@ -5,7 +5,7 @@ import { ProfilePage } from './../../pages/profile/profile';
 import { User } from './../../components/models/user';
 import { HomePage } from './../../pages/home/home';
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, Platform,LoadingController,NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, Platform,LoadingController,Events,NavController, NavParams, ToastController } from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { AngularFireModule} from 'angularfire2';
 import firebase from 'firebase';
@@ -52,12 +52,28 @@ export class LoginPage implements OnInit {
   distance:any;
   itemObject:any;
   foto:any;
-  constructor(public platform:Platform,private uniqueDeviceID: UniqueDeviceID,public http:Http,public loading:LoadingController,public toast:ToastController, public afAuth : AngularFireAuth,public afDatabase:AngularFireDatabase, public navCtrl: NavController,public googleplus:GooglePlus,public afauth:AngularFireAuth,public afd:AngularFireDatabase) {
+  time:any;
+  constructor(public events:Events,public platform:Platform,private uniqueDeviceID: UniqueDeviceID,public http:Http,public loading:LoadingController,public toast:ToastController, public afAuth : AngularFireAuth,public afDatabase:AngularFireDatabase, public navCtrl: NavController,public googleplus:GooglePlus,public afauth:AngularFireAuth,public afd:AngularFireDatabase) {
     let today = new Date();
     let dd:number;
     let day:string;
     let month:string;
-    
+    this.events.subscribe('itemObject',value=>{
+      this.name=value.name;
+      this.distance=value.distance;
+      this.foto=value.messengerFoto;
+      this.itemObject=value;
+    })
+    this.events.subscribe('status',value=>{
+      this.statusParam=value;
+      alert(this.statusParam);
+    })
+
+    // this.statusParam=value.status;
+    // this.name=value.name;
+    // this.distance=value.distance;
+    // this.foto=value.foto
+    // this.itemObject=value.itemObject
      dd = today.getDate();
     var mm = today.getMonth()+1; //January is 0!
 
@@ -75,7 +91,6 @@ export class LoginPage implements OnInit {
       .handleNotificationOpened((jsonData)=> {
         let value=jsonData.notification.payload.additionalData
         if(value.status=="assigned"){
-  
           this.flag=true;
           this.statusParam=value.status;
           this.name=value.name;
@@ -83,7 +98,11 @@ export class LoginPage implements OnInit {
           this.foto=value.foto
           this.itemObject=value.itemObject
          }else if(value.status=="finished"){
-             alert("nope");
+          this.statusParam=value.status;
+          this.time=value.time;
+          this.itemObject=value.itemObject;
+
+             alert("finished");
          }else{
 
          }
@@ -91,34 +110,7 @@ export class LoginPage implements OnInit {
       })
       .endInit();
     }else if(this.platform.is("ios")){
-      var iosSettings = {};
-              iosSettings["kOSSettingsKeyAutoPrompt"] = true;
-              iosSettings["kOSSettingsKeyInAppLaunchURL"] = false;
       
-              // Initialize
-    
-              var one=window["plugins"].OneSignal
-              .startInit("2192c71b-49b9-4fe1-bee8-25617d89b4e8", "916589339698")
-              
-              one.iOSSettings(iosSettings)
-
-              one.handleNotificationOpened((jsonData)=> {
-                       let value=jsonData.notification.payload.additionalData
-                       if(value.status=="assigned"){
-                        this.flag=true;
-                        this.statusParam=value.status;
-                        this.name=value.name;
-                        this.distance=value.distance;
-                        this.foto=value.foto
-                
-                        
-                       }else if(value.status=="finished"){
-                           alert("nope");
-                       }else{
-                       }
-
-                       })
-
     }else{
       //window
       this.flag=true;
@@ -247,7 +239,7 @@ export class LoginPage implements OnInit {
       localStorage.setItem('googleLoggedIn',"true");
      
       let loading=this.loading.create({
-        content:'Loading...22'
+        content:'로그인 시도중...'
       })
       loading.present().then(()=>{
       })
@@ -295,9 +287,10 @@ export class LoginPage implements OnInit {
                         lastLogin:this.todayWithTime
                       })
                       this.thingToUnsubscribeFromLater.unsubscribe();
-                      this.navCtrl.setRoot(HomePage,{notification:this.statusParam,notificationValue:this.name,foto:this.foto,distance:this.distance,itemObject:this.itemObject});
-                  }
-                  
+                      this.navCtrl.setRoot(HomePage,{notification:this.statusParam,notificationValue:this.name,foto:this.foto,distance:this.distance,itemObject:this.itemObject,time:this.time});
+                     
+                       }
+                       
 
                 })
                 
@@ -307,11 +300,11 @@ export class LoginPage implements OnInit {
           })
         }).catch((error)=>{
           alert(error);
-          this.status=error
+          this.status="2"+error.message
         })
       }).catch((error)=>{
         alert(error);
-        this.status=error
+        this.status="3"+error.message
       })
    
     

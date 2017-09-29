@@ -65,7 +65,7 @@
             </div>
                
             <div class="flag_info_noshow" *ngIf="!info">
-                    s
+                    
             </div>
     </div>
                 <hr>
@@ -152,22 +152,23 @@
                                     <label>할인 혜택</label>
                                     
                                 </div> 
-                                <div (click)=toggle(6) class="point">
-                                    포인트 사용 *적립포인트는 1000pㅣ사시 사용 가능
+                                <div  class="point">
+                                    포인트 사용 
                                    
-                                    <ion-icon *ngIf="!discount" name="arrow-dropdown"></ion-icon>
-                                    <ion-icon *ngIf="discount" name="arrow-dropup"></ion-icon>
-
+                                  
                                     <div class="flag_payment_info_show" *ngIf="discount">
                                             <hr>
                                             <div  class="discount_point">
-                                                사용가능 0p ({{point}} p 보유)<br>
+                                                <div class="description" >
+                                                        ({{point}} p 보유)<br>
+                                                        *적립포인트는 1000p 이상시 사용 가능
+                                                </div>
                                                 <div style="display: inline-flex;"class="m">
                                                         <div style="float:left"  class="f">
-                                                                <ion-input placeholder="" class="input_point" [ngModel]="pointtouse"></ion-input>
+                                                                <ion-input placeholder="" class="input_point" [(ngModel)]="pointtouse"></ion-input>
                                                         </div>
-                                                        <div style="float:right;margin-top: 2rem;" class="e">
-                                                                <ion-checkbox (ionChange)=pointChecked() [(ngModel)]="pointAll" disabled="false">전액사용</ion-checkbox>전액사용
+                                                        <div style="float:right;width:60%" class="e">
+                                                                <ion-checkbox (ionChange)=pointChecked() style="margin-top:1.5rem" [(ngModel)]="pointAll" disabled="false">전액사용</ion-checkbox>전액사용
                                                         </div>
                                                 </div>
                                                 
@@ -181,17 +182,19 @@
                                     <div class="flag_payment_info_noshow" *ngIf="!discount">
                                         </div>
                                 </div>
-                                <div (click)=toggle(8) class="point">
+                                <div  class="point">
                                         쿠폰 사용 
                                        
-                                        <ion-icon *ngIf="!coupon" name="arrow-dropdown"></ion-icon>
-                                        <ion-icon *ngIf="coupon" name="arrow-dropup"></ion-icon>
     
                                         <div class="flag_payment_info_show" *ngIf="coupon">
                                                 <hr>
                                                 <div class="discount_point">
-                                                        쿠폰 코드를 입력해주세요<br>
-                                                        <ion-input placeholder="" class="input_point" [ngModel]="coupon"></ion-input>
+                                                        <div class="description">
+                                                                쿠폰 코드를 입력해주세요
+                                                        </div>
+                                                        
+                                                        <ion-input  class="input_point" placeholder="포인트입력해주세요" [(ngModel)]=couponvalue placeholder="쿠폰 코드를 입력해주세요"></ion-input>
+                                                        <button ion-button class="btn_right" style="height:3.8rem;" (click)="useCoupon(couponvalue)">쿠폰 사용</button>
                                                 </div>
                                                 <!-- <div class="coupon">
                                                        </div> -->
@@ -208,16 +211,18 @@
                                     <label>결제 금액</label>
                                 </div> 
                                 <div class="final_price">
-                                    {{final_price}} 원
+                                    {{final_price-pointtouse}} 원
                                 </div>
                             <div class="flag_payment_info_show" >
                                     <hr>
                                     거리 : {{distance}} km <br>
                                     3키로 초과부분부터 100m당 50원씩 가산되어 총 금액이 결정됩니다.<br>
-                                    총 금액 : {{price}}
-                                    할인내역 : {{discount_price}}<br>
+                                    총 금액 : {{price}} <br>
+                                    할인내역 :  point : {{pointtouse}} <br>
+                                    적용 쿠폰 : {{coupon_flag}}<br>
                                     <hr>
                                     포인트 : {{mileage}} 적립<br>
+                                    *포인트는 배송이 완료처리 된 후 적립이됩니다.
 
                                     결제시 약관동의가 필요합니다.(필수)<br>
                                     <ion-checkbox [(ngModel)]="checked" disabled="false"></ion-checkbox>
