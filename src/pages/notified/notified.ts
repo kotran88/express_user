@@ -17,7 +17,9 @@ export class NotifiedPage {
   distance:any;
   foto:any;
   itemObject:any;
+  name:any;
   constructor(public navCtrl: NavController,public viewCtrl:ViewController, public navParams: NavParams) {
+    alert("!")
   }
 
   ionViewWillEnter() {
@@ -26,9 +28,8 @@ export class NotifiedPage {
     this.distance=this.navParams.get("distance")
     this.foto=this.navParams.get("foto")
     this.itemObject=this.navParams.get("itemObject")
-    if(this.id==undefined||this.id==null){
-      this.id="test Id "
-    }
+    this.name=this.navParams.get("name");
+    alert(this.name+","+this.id+""+this.distance)
   }
   confirm(){
     this.viewCtrl.dismiss();
@@ -37,10 +38,11 @@ export class NotifiedPage {
     console.log(value)
   }
   chat(){
-    this.navCtrl.push(ChatPage,{item:this.itemObject})
+    // alert(this.itemObject.orderNo);
+    // this.navCtrl.push(ChatPage,{item:this.itemObject})
   }
-  goBack(){
-      this.viewCtrl.dismiss();
-  }
+  // goBack(){
+  //     this.viewCtrl.dismiss();
+  // }
 
 }

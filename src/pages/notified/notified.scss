@@ -20,7 +20,10 @@ page-notified {
     margin-top: 1rem;
   }
   .confirm{
-    width:100%;
+    background: transparent;
+    color: black;
+    border: solid 1px;
+    width: 100%;
   }
     .main-view{
         background: transparent;
@@ -44,13 +47,18 @@ page-notified {
       color:#000;
       float:left;
     }
+    .label{
+      margin:0;
+      font-size:1.6rem;
+  }
       .modal_content {
+        height: auto;
+        background: aliceblue;
         position: absolute;
         top: calc(50% - (50%/2));
         left: 0;
         right: 0;
         width: 80%;
-        height: 65%;
         padding: 10px;
         z-index: 100;
         margin: 0 auto;

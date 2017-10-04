@@ -12,6 +12,7 @@ page-request-modal {
         height:3.8rem;
         float:right;
     }
+    
     .time{
         height: 40%;
         .time_list{
@@ -186,7 +187,44 @@ page-request-modal {
         background-color: aliceblue;
         width: 100%;
         /* position: relative; */
-        height: 35%;
+        height: 15.5rem;
+        input{
+            width:40%;
+        }
+        .btn{
+            margin-top:1rem;
+            float: right;
+            height: 3rem;
+            width: auto;
+        }
+        .start_input{
+            margin-left:1.6rem;
+            font-size:1.2rem;
+            float:left;
+        }
+        .input_cell{
+            width: 40%;
+            margin-left: 0.8rem;
+            width: 50%;
+            height: 3rem;
+            margin-top: 1rem;
+        }
+        .font_weight{
+            font-weight:bold;
+            font-family: "Lucida Console","impact","Lucida Sans Typewriter",monaco,"Bitstream Vera Sans Mono",monospace;
+        }
+       
+        .label_header{
+            margin-left:1rem;
+            font-size: 2.2rem;
+            font-family: unset;
+        }
+        .label_content{
+            margin-left:1rem;
+            float: left;
+            width: 95%;
+            margin-bottom:0.5rem;
+        }
         .label_content{
             float: left;
             width: 95%;
@@ -194,18 +232,20 @@ page-request-modal {
             margin-left: 1.5rem;
         }
         
-        .start_address{
-            width: 90%;
-            float: left;
-            margin-bottom:0.5rem;
-        }
-        .end_address{
-            width:90%;
-            float:left;
-            margin-bottom:0.5rem;
-        }
+        
         .item-block {
             min-height: 0;
+        }
+        .start{
+            border: solid 1px;
+            border-radius: 1rem;
+            width: 95%;
+            background: white;
+            float:left;
+            display: flow-root;
+            margin-top: 0.5rem;
+            margin-left:0.8rem;
+            font-size: 1.6rem;
         }
         .info_button{
             float: right;
@@ -225,14 +265,8 @@ page-request-modal {
         .flag_info_noshow{
             display: none;
         }
-        .start{
-            height: 100px;
-            font-size: 1.6rem;
-            /* height: 50%; */
-            margin-bottom: 1rem;
-        }
+        
         .input{
-            width: 90%;
             margin-bottom:0.5rem;
             float: left;
             background-color: white;

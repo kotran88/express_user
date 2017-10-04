@@ -66,7 +66,7 @@ export class LoginPage implements OnInit {
     })
     this.events.subscribe('status',value=>{
       this.statusParam=value;
-      alert(this.statusParam);
+      alert("login"+this.statusParam);
     })
 
     // this.statusParam=value.status;

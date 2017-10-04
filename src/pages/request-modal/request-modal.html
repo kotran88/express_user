@@ -13,71 +13,44 @@
       <div class="content_main">
         
             <div class="info">
-                    
-                    <div    class="label">
-                                배송정보
-                    <button   style="float:right" class="btn" ion-button (click)="favorite()">가져오기</button>
-                </div> 
-               
-                
-            <div class="flag_info_show">
-                    <div class="start">
-                        <div class="label">
-                                출발지점
-
-                        </div>
+                <div  class="cellphone">
                         
-                        <div class="label_content">
-
-                                <div class="start_address">
-                                        {{start}}
-                                </div>
-                                <!-- <div class="info_button">
-                                        <button  style="float:right" class="btn" ion-button (click)="add(start)">리스트에<br> 추가</button>
-                                </div> -->
-                                <div class="start_address">
-                                        {{startDetail}}
-                                </div>
-                        </div>
-                            
-                        
-                    </div>
-                    <div class="end">
-                        <div class="label">
-                                도착지점
-                        </div>
-                        <div class="label_content">
-                            <div class="end_address">
-                               {{end}}
+                        <ion-input type="number"  class="input_cell" value={{cellphone}} [(ngModel)]="cellphone" >{{cellphone}}</ion-input>
+                </div>
+                <div class="right">
+                        <button   style="float:right" class="btn" ion-button (click)="favorite()">가져오기</button>
+                </div>
+                        <div class="start">
+                            <div class="label_header">
+                                    <span class="font_weight">픽업</span>  {{start}}
                             </div>
-                            <!-- <div class="info_button">
-                                    <button  style="float:right" class="btn" ion-button (click)="add(end)">리스트에<br> 추가</button> 
-                            </div> -->
-                            <div class="end_address">
-                                    {{endDetail}}
-                            </div>
+                            <div *ngIf="startDetail!=''" class="start_input">
+                                [{{startDetail}}]
                         </div>
                            
-                    </div>
-                    <div style="margin-bottom:10px; margin-left:15px; width:80%;" class="cellphone">
-                            <ion-input type="number" placeholder="휴대전화번호를 입력해주세요" class="input" [ngModel]="cellphone"></ion-input>
-                    </div>
-            </div>
+                        </div>
+                        <hr style="width: 100rem;">
+                        <div class="start" style="margin-top:0; margin-bottom:0.5rem;">
+                           
+                            <div class="label_header">
+                                    <span class="font_weight">배송</span>   {{end}}
+                            </div>
+                                  <div *ngIf="endDetail!=''" class="start_input">
+                                          [{{endDetail}}]
+                                  </div>
+                        </div>
+                        
                
-            <div class="flag_info_noshow" *ngIf="!info">
-                    
-            </div>
+            
     </div>
                 <hr>
                 <div class="time">
-                    <div (click)=toggle(2) class="label">
-                        <label>희망 배송 시간을 선택해주세요</label>
-                          <ion-icon *ngIf="!flag_payment_info" name="arrow-dropdown"></ion-icon>
-                          <ion-icon *ngIf="flag_payment_info" name="arrow-dropup"></ion-icon>
+                    <div  class="label">
+                        <label>희망 픽업/배송 시간을 선택해주세요</label>
                       </div> 
                   <div class="flag_payment_info_show" *ngIf="time">
                         <ion-item>
-                                <ion-label>현재시간 기준</ion-label>
+                                <ion-label>픽업시간</ion-label>
                                 <ion-select (ionChange)="timeChanged()" [(ngModel)]="desiredTime">
                                   <ion-option value="ASAP">가능한 빨리</ion-option>
                                   <ion-option value="1to2">1~2시간이내</ion-option>
@@ -86,10 +59,20 @@
                                 </ion-select>
                               </ion-item>
                   </div>
-                  <div class="flag_payment_info_noshow" *ngIf="!time">
-                  </div>
-                 
-                        
+
+                
+                          <div class="flag_payment_info_show" *ngIf="time">
+                                <ion-item>
+                                        <ion-label>배송시간</ion-label>
+                                        <ion-select (ionChange)="timeChanged()" [(ngModel)]="desiredTime">
+                                          <ion-option value="ASAP">가능한 빨리</ion-option>
+                                          <ion-option value="1to2">1~2시간이내</ion-option>
+                                          <ion-option value="3to6">3~6시간이내</ion-option>
+                                          <ion-option value="today">오늘 이내</ion-option>
+                                        </ion-select>
+                                      </ion-item>
+                          </div>
+
           </div> 
                 <hr>
                 <div class="freight">

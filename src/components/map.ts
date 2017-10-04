@@ -16,6 +16,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Dialogs } from '@ionic-native/dialogs';
 import { OneSignal } from '@ionic-native/onesignal';
 import { Subscription } from 'rxjs/Subscription';
+import { MetroServiceProvider } from './../providers/metro-service/metro-service';
 
 declare var google;
 
@@ -26,7 +27,8 @@ declare var google;
      providers:[CarProvider,PickupDirective]
 })
 export class MapDirective implements OnInit,OnChanges  {
-
+    station:any;
+    station_distance:number;
   unsubscriber: Subscription = new Subscription();
     latOnly:any;
     lngOnly:any;
@@ -68,6 +70,7 @@ export class MapDirective implements OnInit,OnChanges  {
     @Input() fetchingExpress:any;
     @Input() deliveryGuy:any;
     start_list=[];
+    result_metro=[];
     end_list=[];
     @Output() mapIsCreated : EventEmitter<any>=new EventEmitter();
     @Output() start : EventEmitter<any>=new EventEmitter();
@@ -113,7 +116,7 @@ export class MapDirective implements OnInit,OnChanges  {
      endMarker=[];
      userId:string;
      uid:string;
-    constructor(public sim:SimulateProvider, public toast:ToastController, public loading:LoadingController,public platform:Platform, public http:Http, 
+    constructor(public metro:MetroServiceProvider,public sim:SimulateProvider, public toast:ToastController, public loading:LoadingController,public platform:Platform, public http:Http, 
         private alertCtrl:AlertController,public pick:PickupDirective,public geo:Geolocation,
         public afDatabase:AngularFireDatabase,public modal:ModalController
   ){
@@ -224,7 +227,6 @@ console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
         }
     }
     resetMarker(){
-        
         console.log("reset");
         console.log(this.startMarker);
         console.log(this.endMarker);
@@ -237,13 +239,17 @@ console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
             this.endMarker[i].setMap(null);
         }
         this.endMarker=[];
-       
+       console.log("deleted")
         this.notifyingChange.next({flag:false})
         if(this.map!=undefined){
-
-            this.map.panTo(this.currentLocation)
-            this.map.setZoom(15)
+            console.log("deleted2")
+            console.log(this.currentLocation)
+            if(this.currentLocation!=undefined){
+                this.map.panTo(this.currentLocation)
+                this.map.setZoom(15)
+            }
         }
+        console.log("deleted3")
     }
     resetStartMarker(value){
         if(this.startMarker!=undefined){
@@ -283,11 +289,42 @@ console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
             }
         }
     }
+    getAjacentStation(start,end){
+        var total=[];
+        var distance=[];
+        var min_distance
+        start=37.497945;
+        end=127.027621;
+        var result_metro=this.metro.getMetro().subscribe(data=>{
+            this.result_metro=data;
+             for(var i=0; i<this.result_metro.length; i++){
+ 
+               var distance1 = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(this.result_metro[i].XPOINT_WGS,this.result_metro[i].YPOINT_WGS),
+                new google.maps.LatLng(start,end));  
+                distance1=(parseInt(distance1)/1000);
+                distance.push(distance1)
+                total.push({name:this.result_metro[i].STATION_NM,dis:distance})
+                min_distance=Math.min.apply( Math, distance );
+ 
+             }
+             for(var j=0; j<total.length; j++){
+               if(total[j].dis==min_distance){
+                 console.log(total[j]);
+                 console.log("same")
+                 this.station=total[j]
+               }
+             }
+             this.station_distance=min_distance;
+             console.log(min_distance)
+ 
+           });
+    }
     ngOnChanges() {
         console.log("this.makeMarker");
         console.log(this.makeMarker);
         if(this.makeMarker=="start"){
             console.log("makeMarker");
+            
             console.log(this.makeMarkerInformation)
             
             var loc=new google.maps.LatLng(this.makeMarkerInformation.lat,this.makeMarkerInformation.lng);
@@ -385,10 +422,7 @@ console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
             console.log(loc)
             var distance=this.panningLocation[1];
             console.log(distance);
-            for(var i=0; i<this.startMarker.length; i++){
-                console.log(this.startMarker[i].position.lat())
-                console.log(this.startMarker[i].position.lng())
-            }
+          
 
             if(this.panningLocation.length>1){
                 //즐겨찾기 인경우에 3,4번째 패러미터로 startLocation endLocation좌표가 넘어옴
@@ -412,10 +446,12 @@ console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
             console.log(this.startMarker.length);
             console.log(this.endMarker);
             console.log(this.endMarker.length);
-            for(var i=0; i<this.startMarker.length; i++){
-                console.log(i+"q")
-                console.log(this.startMarker[i].position);
-                console.log(this.endMarker[i].position)
+            if(this.startMarker!=undefined){
+                for(var i=0; i<this.startMarker.length; i++){
+                    console.log(i+"q")
+                    console.log(this.startMarker[i].position);
+                    console.log(this.endMarker[i].position)
+                }
             }
             var loc=new google.maps.LatLng(this.startMarker[0].position.lat(),this.startMarker[0].position.lng())
             var loc2=new google.maps.LatLng(this.endMarker[0].position.lat(),this.endMarker[0].position.lng())
@@ -433,11 +469,11 @@ console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
            
             console.log("panningToMiddle");
             if(distance<1){
-                var newloc=new google.maps.LatLng(this.map.getCenter().lat()*0.9999,this.map.getCenter().lng())
+                var newloc=new google.maps.LatLng(this.map.getCenter().lat(),this.map.getCenter().lng())
                 this.map.setCenter(newloc);
                 this.map.setZoom(14);
             }else if(distance<3){
-                var newloc=new google.maps.LatLng(this.map.getCenter().lat(),this.map.getCenter().lng())
+                var newloc=new google.maps.LatLng(this.map.getCenter().lat()*0.9998,this.map.getCenter().lng())
                 this.map.setCenter(newloc);
                 this.map.setZoom(13);
             }else if(distance<5){
@@ -447,7 +483,7 @@ console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
                 this.map.setZoom(13);
             }else if(distance<7){
                 console.log("5.xkm")
-                var newloc=new google.maps.LatLng(this.map.getCenter().lat()*0.9995,this.map.getCenter().lng())
+                var newloc=new google.maps.LatLng(this.map.getCenter().lat(),this.map.getCenter().lng())
                 this.map.setCenter(newloc);
                 this.map.setZoom(12);
             }else{
@@ -754,11 +790,25 @@ getResult(v,flag,results){
      
     var service = new google.maps.places.AutocompleteService();
     var location=new google.maps.Geocoder();
-      
+    let me = this;
+    service.getPlacePredictions({ input: v,  componentRestrictions: {country: 'Kr'} }, function (predictions, status) {
+        console.log(predictions);
+        console.log(status);
+        console.log("getttttttt");
+          if(predictions!=null){
+              console.log("ll:")
+              console.log(predictions.length);
+            predictions.forEach(function (prediction) {
+          });
+          }else{
+            console.log("prediction == null"+predictions);
+          }
+          
+      });
       location.geocode({'address':v},(results,status)=>{
         if(status=='OK'){
           console.log("result:")
-          console.log(this.startMarker);
+         console.log(results);
             this.getResult(v,flag,results);
           
         }
@@ -927,6 +977,7 @@ getResult(v,flag,results){
               };
     
       let location=new google.maps.LatLng(lat,lng);
+      this.getAjacentStation(lat,lng);
       this.currentLocation=location;
       localStorage.setItem("currentPosition","true");
       localStorage.setItem("lat",lat.toString())

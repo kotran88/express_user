@@ -16,14 +16,24 @@
 // automatically applied to the <body> element in the app.
 
 @font-face {
-  font-family: "daum";
-  src: url(../assets/fonts/daum.ttf) format("ttf");
+font-family: "miseng";
+src: url(../assets/fonts/SDMiSaeng.ttf) format("ttf");
+font-weight: 200
+}
+@font-face {
+  font-family: "timon";
+  src: url(../assets/fonts/SDMiSaeng.ttf) format("ttf");
   font-weight: 200
   }
-  body {
-  font-family: "daum" !important;
+body {
+  font-family: "timon" !important;
+}
+  
+  .toolbar-background-md{
+    border-color: #219B44;
+    background: #219B44;
   }
-
+  
 .activeHighlight{
   background-color:map-get($colors,light);
 }

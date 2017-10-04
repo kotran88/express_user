@@ -6,7 +6,7 @@ import { LoginPage } from './../login/login';
 import { Http,Headers ,RequestOptions} from '@angular/http';
 import { Location } from './../../components/models/location';
 import { MapDirective } from './../../components/map';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Component, ViewChild,OnInit,ChangeDetectionStrategy, OnChanges, Input,NgZone } from '@angular/core';
 import { NavController, ToastController, LoadingController, AlertController,Events,NavParams, ModalController, Platform } from 'ionic-angular';
@@ -18,6 +18,7 @@ import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@ionic-nativ
 
 import { TimeService } from './../../shared/time';
 
+import { Subscription } from 'rxjs/Subscription';
 import {NotifiedPage} from './../notified/notified'
 import { Geolocation } from '@ionic-native/geolocation';
 import { RequestModalPage} from './../request-modal/request-modal';
@@ -34,6 +35,8 @@ declare var google;
 })
 
 export class HomePage implements OnInit,OnChanges  {
+  openFavorite:boolean=true;
+  unsub: Subscription = new Subscription();
   mention_detail2:string;
   point:number=0;
   countStart:number=0;
@@ -172,12 +175,14 @@ export class HomePage implements OnInit,OnChanges  {
 
       });
     })
+    
     if(this.imageUrl==undefined){
       this.imageUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png"
     }
     if(this.phone==undefined){
       this.phone="01079998598";
     }
+    
     var getcurrentPoint=this.afDatabase.list('/profile/'+this.uid+'/point/', { preserveSnapshot: true })
      getcurrentPoint.subscribe(snapshots=>{
       snapshots.forEach((element)=>{
@@ -222,7 +227,6 @@ export class HomePage implements OnInit,OnChanges  {
     this.pages=[
         
         {title:'나의 주문 목록 보기',component:ViewRequestListPage,attr:"request"},
-        {title:'크레딧 상세보기',component:ViewRequestListPage,attr:"request"},
         {title:'로그아웃',component:ViewRequestListPage,attr:"Logout"}
       ]
       this.activePage=this.pages[0];
@@ -233,7 +237,7 @@ export class HomePage implements OnInit,OnChanges  {
 
   }
   getFavorite(element){
-    this.mention="";
+    this.mention="요금 : "+this.price;
     this.mention_detail="";
     this.mention_detail2="";
     this.mapTopChanged=0;
@@ -270,17 +274,24 @@ export class HomePage implements OnInit,OnChanges  {
   }
   mapIsCreated(value){
     if(value=="true"){
+      // let modal = this.modalCtrl.create(NotifiedPage,{name:"name",id:"thisisid"
+      //   ,distance:2323});
+      //   modal.present();
       var status=this.navParam.get("notification");
       this.events.subscribe("status",value=>{
         status=value;
+        alert("new status"+status);
+        this.events.unsubscribe("status",()=>{
+          alert("unsub")
+        });
       })
       var itemObject=this.navParam.get("itemObject");
       this.events.subscribe("itemObject",value=>{
-        alert("!")
         itemObject=value;
-      })
-      if(status!=undefined){
+        alert("item");
+        alert("status : "+status);
         if(status=="assigned"){
+          alert("s!")
           this.fetchingExpress=true;
           this.deliveryGuy=itemObject.deliveryGuy;
           this.panTodeliveryGuy="true";
@@ -300,9 +311,10 @@ export class HomePage implements OnInit,OnChanges  {
                 
               });
           })
+          alert("modal!"+itemObject.messengerName+","+itemObject.deliveryGuy+","+itemObject.messengerFoto+","+itemObject.distance);
          // "id":this.userId,"foto":this.foto,"time": todaywithTime,"distance":distance
-         let modal = this.modalCtrl.create(NotifiedPage,{name:'정긍정',id:itemObject.deliveryGuy,
-         foto:itemObject.messengerFoto,distance:itemObject.distance});
+         let modal = this.modalCtrl.create(NotifiedPage,{name:itemObject.messengerName,id:itemObject.deliveryGuy,
+         foto:itemObject.messengerFoto,distance:itemObject.distance,itemObject:itemObject});
          let me = this;
          modal.onDidDismiss(data => {
          });
@@ -318,6 +330,10 @@ export class HomePage implements OnInit,OnChanges  {
           alert(itemObject);
           this.navCtrl.push(ChatPage,{"object":itemObject})
         }
+      })
+      if(status!=undefined){
+        alert("sssss::"+status);
+       
         }
        
     }
@@ -880,6 +896,7 @@ export class HomePage implements OnInit,OnChanges  {
         })
         alert.present();
     }else{
+      
       this.first_flag=false;
       this.result_flag=true;
       this.showingDetailEnd=false;
@@ -892,6 +909,7 @@ export class HomePage implements OnInit,OnChanges  {
         if(distance!=NaN){
           this.changeMarker="default";
           this.showndistance=distance;
+          this.mention="요금 : "+this.price+", 거리 : "+this.showndistance
           this.showResult=true;
           this.default=true;
   
@@ -917,8 +935,11 @@ export class HomePage implements OnInit,OnChanges  {
   showingFavorite(){
     this.showFavorite=!this.showFavorite;
   }
+  toggle(){
+    this.openFavorite=!this.openFavorite;
+  }
    openPage(page){
-    if(page.attr=="Logout"){
+     if(page.attr=="Logout"){
       if(this.platform.is("android")){
         this.googleplus.disconnect();
         localStorage.setItem("googleLoggedIn","false")
@@ -967,6 +988,7 @@ export class HomePage implements OnInit,OnChanges  {
     this.slat=value.lat;
     this.slng=value.lng;
     this.makeMarkerInformation=[];
+    
     console.log("chooseItem")
     console.log(this.slat+","+this.slng);
     this.makeMarker="start";
@@ -1036,6 +1058,7 @@ export class HomePage implements OnInit,OnChanges  {
       
     }
   entered(){
+    this.mapTopChanged=15;
     console.log("entered")
     this.showingDetailStart=false;
     this.default=false;
@@ -1259,6 +1282,7 @@ export class HomePage implements OnInit,OnChanges  {
     console.log(value);
     this.zone.run(()=>{
       if(value.flag=="start"){
+        this.mapTopChanged=15;
         this.startPoint=value.address;
         this.default=false;
         this.showingByClickEnd=false;
@@ -1269,6 +1293,7 @@ export class HomePage implements OnInit,OnChanges  {
         this.showingDetailStart=true;
         this.showingDetailEnd=false;
       }else if(value.flag=="end"){
+        this.mapTopChanged=15;
         this.endPoint=value.address;
         this.default=false;
         this.showingByClickEnd=true;
@@ -1538,6 +1563,7 @@ export class HomePage implements OnInit,OnChanges  {
     console.log(v)
     if(v.flag==false){
       //reset
+      this.mention="픽업/배송지를 입력해주세요"
       this.first_flag=true;
       this.result_flag=false;
       this.startPoint="";
@@ -1590,6 +1616,9 @@ export class HomePage implements OnInit,OnChanges  {
       }
       
     }
+    console.log("!!!");
+    console.log(this.startPoint);
+    console.log(this.endPoint);
     if(this.startPoint!=undefined&&this.endPoint!=undefined){
       
       if(this.showndistance!=NaN&&this.endPoint!=""&&this.startPoint!=""){
@@ -1611,6 +1640,7 @@ export class HomePage implements OnInit,OnChanges  {
       }
       
     }
+    console.log("@@")
   }
   calculatePrice(distance){
     this.changeMarker="default"

@@ -1,33 +1,33 @@
 map{
-
-   .start_flag{
-       background-image:url('./../assets/icon/start.svg');
-       position: absolute;
-       left:52%;
-       top:43.5%; //커질수록 아래로 감. //iphone : 51 / 52 left / top
-       width:24px;
-       height:24px;
-       margin-left: -10px;
-       margin-top: -27px;
-   }
-   .end_flag{
-    background-image:url('./../assets/icon/start.svg');
-    position: absolute;
-    left:52%;
-    top:43.5%; //커질수록 아래로 감.
-    width:24px;
-    height:24px;
-    margin-left: -10px;
-    margin-top: -27px;
-}
-.default{
-    background-image:url('');
-    position: absolute;
-    left:51.2%;
-    top:51%; //커질수록 아래로 감.
-    width:24px;
-    height:24px;
-    margin-left: -10px;
-    margin-top: -27px;
-}
-}
+    
+       .start_flag{
+           background-image:url('./../assets/icon/start.svg');
+           position: absolute;
+           left:52%;
+           top:47.5%; //커질수록 아래로 감. //iphone : 51 / 52 left / top
+           width:24px;
+           height:24px;
+           margin-left: -10px;
+           margin-top: -27px;
+       }
+       .end_flag{
+        background-image:url('./../assets/icon/start.svg');
+        position: absolute;
+        left:52%;
+        top:47.5%; //커질수록 아래로 감.
+        width:24px;
+        height:24px;
+        margin-left: -10px;
+        margin-top: -27px;
+    }
+    .default{
+        background-image:url('');
+        position: absolute;
+        left:51.2%;
+        top:51%; //커질수록 아래로 감.
+        width:24px;
+        height:24px;
+        margin-left: -10px;
+        margin-top: -27px;
+    }
+    }

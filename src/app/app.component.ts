@@ -14,6 +14,7 @@ import { NotifiedPage } from './../pages/notified/notified'
 import { StandbyPage} from './../pages/standby/standby'
 import { ViewRequestListPage } from './../pages/view-request-list/view-request-list';
 import { ViewRequestedAllPage } from './../pages/view-requested-all/view-requested-all';
+
 @Component({
   templateUrl: 'app.html'
 })
@@ -38,8 +39,11 @@ export class MyApp {
       one.handleNotificationOpened((jsonData)=> {
                let value=jsonData.notification.payload.additionalData
                if(value.status=="assigned"){
+                alert("published")
                 this.events.publish('status',value.status)
+                alert("published11")
                 this.events.publish('itemObject',value.itemObject)
+                
                }else if(value.status=="finished"){
                    alert("finished");
                }else if(value.status=="chat"){

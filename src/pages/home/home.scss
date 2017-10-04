@@ -34,11 +34,12 @@ page-home {
 }
 
 .text_left{
+    margin-top: 1.5rem;
     float: left;
     width:40%;
 }
 .button_right{
-    width:60%;
+    width:100%;
     button{
         background-color: transparent;
         border: solid 1px;
@@ -48,7 +49,11 @@ page-home {
         font-size: 1.2rem;
         width: fit-content;
     }
-    float: right;
+}
+.right{
+    margin-top:2.5rem;
+    float:right;
+    width:30%;
 }
 .favorite{
     text-align: center;
@@ -89,6 +94,7 @@ page-home {
     float: right;
 }
 .floating_icon{
+    z-index: 100000000;
     border-radius: 50%;
     position: absolute;
     left: 85%;
@@ -108,6 +114,7 @@ page-home {
 }
 
     .title{
+        font-size:2rem;
         line-height: 5rem;
         float: left;
         padding: 0;
@@ -126,13 +133,13 @@ page-home {
         border-radius: 50%;
     }
     button.nav{
+        border: solid 0.5px green;
         background-color:transparent;
       color:#000;
       float:right;
       width: 20%;
       font-size: 2rem;
       height: 4rem;
-      border: solid 0.1px;
     }
     .toolbar-md {
         padding: 4px;
@@ -194,22 +201,41 @@ page-home {
             top: 17%;
             left: 5%;
         }
+        .start_input{
+            margin-left:1.6rem;
+            font-size:1.2rem;
+            float:left;
+        }
+        .font_weight{
+            font-weight:bold;
+            font-family: "Lucida Console","impact","Lucida Sans Typewriter",monaco,"Bitstream Vera Sans Mono",monospace;
+        }
         .start{
+            border: solid 1px;
+            border-radius: 1rem;
+            width: 95%;
+            background: white;
+            float:left;
+            display: flow-root;
+            margin-top: 0.5rem;
             margin-left:0.8rem;
             font-size: 1.6rem;
-            /* height: 50%; */
         }
         .label_header{
+            margin-left:1rem;
             font-size: 2.2rem;
             font-family: unset;
-            margin-bottom: 0.6rem;
         }
         .label_content{
+            margin-left:1rem;
             float: left;
             width: 95%;
             margin-bottom:0.5rem;
-            margin-left: 1.5rem;
         }
+        .toolbar-background{
+            background: #219B44;
+        }
+        
         .result_flag{
             display: flow-root;
             margin-top: 0.3rem;
@@ -258,13 +284,14 @@ page-home {
             position: absolute;
             width: 100%;
             height: 20%;
-            top: 75%;
+            top: 70%;
             .search_bottom{
                 bottom: 0;
                 width: 100%;
                 margin: auto;
             }
             .dragging_mention{
+                background:aliceblue;
                 font-size: 1.7rem;
                 bottom: 0px;
                 width: 100%;
@@ -272,6 +299,7 @@ page-home {
                 text-align: center;
             }
             .dragging_mention2{
+                background:aliceblue;
                 font-size: 1.7rem;
                 bottom: 0px;
                 width: 100%;
@@ -354,7 +382,9 @@ page-home {
         }
         .swipeup_mention{
             position: relative;
-            top: 15%;
+            top: 30%;
+            height:20%;
+            background: rgba(255,255,255,0.5);
             font-size:1.8rem;
             margin-left: auto;
             margin-right: auto;

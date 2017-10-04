@@ -9,17 +9,19 @@
 
 <ion-content class="main-view" padding>
     
-  <div class="modal_content">
+  <div class="modal_content" style="background:aliceblue">
       <!-- <ion-rating (ionClick)="log($event)"> </ion-rating> -->
       <div class="header">배달원 지정 안내</div>
       <div class="content">
         <div class="image">
-          <img src="{{foto}}"/>
         </div>
         <div class="info">
-            배달자 ID : {{id}}<br>
-            배달자 이름 : {{name}}<br>
-            거리 : {{distance}}<br>
+            <p style="margin-bottom:0.35rem;" class="label">배달자 ID</p>
+            {{id}}<br>
+            <p style="margin-bottom:0.35rem;" class="label">배달자 이름</p>
+            {{name}}<br>
+            <p style="margin-bottom:0.35rem;" class="label">거리</p>
+            {{distance}}<br>
             
         </div> 
       </div>

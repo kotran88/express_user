@@ -1,11 +1,10 @@
-<ion-header>
-  <ion-navbar >
+<ion-header >
+  <ion-navbar style="background: #219B44;" >
     <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
+      <ion-icon style="color: white;" name="menu"></ion-icon>
     </button>
     <div class="title">
-      지하철택배
-      (유저)
+      배달하나
     </div>
     <div class="icons">
         <span style="float:left;" class="floating_icon">
@@ -15,10 +14,10 @@
             </span>
         </span>
         <button class="nav" (click)="goToMyList()" ion-button >
-            <ion-icon name="list-box"></ion-icon>
+            <ion-icon style="color: white;" name="list-box"></ion-icon>
         </button>
         <button class="nav" (click)="map.centerLocation()" ion-button >
-          <ion-icon name="navigate" ></ion-icon>
+          <ion-icon style="color: white;" name="navigate" ></ion-icon>
         </button>
     </div>
     
@@ -41,7 +40,7 @@
       <div class="upper"  id="upper">
           <ion-row [ngClass]="showingByClickEnd ? 'no_show_by_startclicked': 'search'"  style="margin-bottom:0" class="search" (tap)="entered()" >
             <ion-col width-100> 
-              <ion-searchbar  style="padding:6px;" #searchBar placeholder="출발지를 입력해주세요"  [(ngModel)]="startPoint" clearInput>{{startPoint}}</ion-searchbar>
+              <ion-searchbar  style="padding:6px;" #searchBar placeholder="픽업할곳(예: 도곡동 신성빌딩)"  [(ngModel)]="startPoint" clearInput>{{startPoint}}</ion-searchbar>
               <ion-list [style.width.px]="width_style" class="pastList" *ngIf=showMyStart>
                 <ion-item style="height: 2.5rem; min-height: 0;">
                     <p style="float:left">최근 검색어 </p> <p style="float:right"><button (click)="closePast('start')"><ion-icon name="close"></ion-icon></button>
@@ -91,30 +90,24 @@
   <div class="result_flag" *ngIf="result_flag">
       <div class="start">
           <div class="label_header">
-                  픽업지점
+                  <span class="font_weight">픽업</span>  {{startPoint}}
           </div>
-          <div class="label_content">
-                  <div class="start_address">
-                          {{startPoint}}
-                  </div>
-                  <div style="float:left;" class="start_input">
-                          {{startDetail}}
-                  </div>
-          </div>
+          <div *ngIf="startDetail!=''" class="start_input">
+              [{{startDetail}}]
       </div>
-      <div class="start">
+         
+      </div>
+      <hr style="width: 100rem;">
+      <div class="start" style="margin-top:0; margin-bottom:0.5rem;">
+         
           <div class="label_header">
-                  도착지점
+                  <span class="font_weight">배송</span>   {{endPoint}}
           </div>
-          <div class="label_content">
-                  <div class="start_address">
-                          {{endPoint}}
-                  </div>
-                  <div style="float:left;" class="start_input">
-                          {{endDetail}}
-                  </div>
-          </div>
+                <div *ngIf="endDetail!=''" class="start_input">
+                        [{{endDetail}}]
+                </div>
       </div>
+      
 
       
   </div>
@@ -124,27 +117,22 @@
 
 
                    
-    <ion-row style="width:100%; height: auto; " [ngClass]="showResult ? 'show_upper' : 'no-show'"> 
+    <ion-row style="width:100%; height: 4rem; " [ngClass]="showResult ? 'show_upper' : 'no-show'"> 
         <ion-col  width-100>
              <ion-list style="margin:0">
-             
                     <ion-item>
-                      <div class="text_left">
-                          <span class="first">거리 : {{showndistance}}km </span><br>
-                          <span>요금 : {{price}}원</span><br>
-                      </div>
                       <div class="button_right">
-                          <button class="bottom_bar" style="width:90%" ion-button (click)="favorite()">즐겨찾기에 추가</button><br>
-                            <button class="bottom_bar" style="width:90%" ion-button (click)="map.resetMarker()" >Reset</button>
+                          <button class="bottom_bar" style="width:45%; font-family: -webkit-body; float:left;" ion-button (click)="favorite()">즐겨찾기에 추가</button>
+                            <button class="bottom_bar" style="width:45%; font-family: -webkit-body; float:right;" ion-button (click)="map.resetMarker()" >Reset</button>
                       </div>
                       
                    </ion-item>
              </ion-list>
         </ion-col>
      </ion-row>
-     <ion-row *ngIf="default" style="width:100%;">
+     <ion-row *ngIf="default" style="width:100%; height:5rem;">
      <ion-col>
-        <button  style="width:100%"  ion-button block color="dark"  (click)="requesting()"  >신청하기</button>
+        <button  style="width:100%;background:#219B44;"   ion-button block color="dark"  (click)="requesting()"  >신청하기</button>
       </ion-col>
      </ion-row>
      
@@ -204,7 +192,7 @@
     
      <p [ngClass]="showFavorite ? 'swipeup_mention':'show_mention'"> {{mention}}</p>
      
-      <ion-row   (click)="showingFavorite()" [ngClass]="showFavorite ? 'swipeup' : 'show'" >
+      <!-- <ion-row   (click)="showingFavorite()" [ngClass]="showFavorite ? 'swipeup' : 'show'" >
           <ion-col>
               <p  style="margin:0;">즐겨찾기</p>
               <ion-icon *ngIf="!showFavorite" name="arrow-dropdown"></ion-icon>
@@ -216,18 +204,13 @@
               </div>
               
           </ion-col>
-        </ion-row>
+        </ion-row> -->
   </div>
 
 <ion-menu class="menu"  [content]="content">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title class="title_menu">MENU</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    
     <ion-content class="c">
       <ion-list>
-        <ion-list>
             <div class="profile">
                 <img class="img" src="{{imageUrl}}"/>
                 <p>{{userId}}</p>
@@ -236,8 +219,20 @@
                 
             </div>
             
-              <button menuClose ion-item *ngFor="let p of pages" [class.activeHighlight]="checkActive(p)" (click)="openPage(p)">{{p.title}}</button>
-          </ion-list>
+            
+              <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">{{p.title}}
+                  
+              </button>
+
+              <br>
+              <ion-item >
+                  즐겨찾기 
+                </ion-item>
+                <div *ngIf="openFavorite">
+                    <ion-item style="cursor:pointer"  (click)="getFavorite(ele)" menuToggle  *ngFor="let ele of favorite_information ">
+                        &nbsp;&nbsp;&nbsp;&nbsp;{{ele.title}}
+                     </ion-item>
+                </div>
       </ion-list>
     </ion-content>
   </ion-menu>

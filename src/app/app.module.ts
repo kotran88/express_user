@@ -2,6 +2,7 @@ import { NotifiedPage } from './../pages/notified/notified';
 import { ViewRequestListPage } from './../pages/view-request-list/view-request-list';
 import { ViewRequestedAllPage } from './../pages/view-requested-all/view-requested-all';
 import { UniqueDeviceID } from '@ionic-native/unique-device-id';
+import { MetroServiceProvider } from './../providers/metro-service/metro-service';
 
 // import { TimeService } from './../shared/time'
 import { ProfilePage } from './../pages/profile/profile';
@@ -106,6 +107,7 @@ import { Camera } from '@ionic-native/camera';
   ],
   providers: [
     StatusBar,
+    MetroServiceProvider,
     BackgroundGeolocation,
     SplashScreen,
     NativeGeocoder,
