@@ -49,15 +49,13 @@
                         <label>희망 픽업/배송 시간을 선택해주세요</label>
                       </div> 
                   <div class="flag_payment_info_show" *ngIf="time">
-                        <ion-item>
+                        <ion-item style="width:50%;float:left">
                                 <ion-label>픽업시간</ion-label>
-                                <ion-select (ionChange)="timeChanged()" [(ngModel)]="desiredTime">
-                                  <ion-option value="ASAP">가능한 빨리</ion-option>
-                                  <ion-option value="1to2">1~2시간이내</ion-option>
-                                  <ion-option value="3to6">3~6시간이내</ion-option>
-                                  <ion-option value="today">오늘 이내</ion-option>
-                                </ion-select>
-                              </ion-item>
+                                
+                        </ion-item>
+                        <ion-item style="width:50%;float:right">
+                                <p (click)="timeChanged()">08:50</p>
+                        </ion-item>
                   </div>
 
                 

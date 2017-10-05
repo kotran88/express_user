@@ -4,6 +4,7 @@ import { request } from './../../components/models/request';
 import { AngularFireDatabase } from 'angularfire2/database';
 import {StandbyPage } from './../standby/standby';
 import { Subscription } from 'rxjs/Subscription';
+import { DatePicker } from '@ionic-native/date-picker';
 
 /**
  * Generated class for the RequestModalPage page.
@@ -69,7 +70,7 @@ export class RequestModalPage implements OnInit {
   uid:string;
   point:number;
   phone:string;
-  constructor(public alertCtrl:AlertController,public viewCtrl:ViewController ,public modalCtrl:ModalController,public navCtrl: NavController,public platform:Platform,public afDatabase:AngularFireDatabase, public navParams: NavParams) {
+  constructor(private datePicker: DatePicker,public alertCtrl:AlertController,public viewCtrl:ViewController ,public modalCtrl:ModalController,public navCtrl: NavController,public platform:Platform,public afDatabase:AngularFireDatabase, public navParams: NavParams) {
     this.desiredTime="ASAP"
     let today = new Date();
     let dd:number;
@@ -202,7 +203,17 @@ export class RequestModalPage implements OnInit {
     }
   }
   timeChanged(){
+    this.datePicker.show({
+      date: new Date(),
+      mode: 'date',
+      androidTheme: this.datePicker.ANDROID_THEMES.THEME_HOLO_DARK
+    }).then(
+      date => alert('Got date: '+ date),
+      err => console.log('Error occurred while getting date: ', err)
+    );
     console.log(this.desiredTime);
+
+
   }
   forward_clicked(){
     this.type="animal";

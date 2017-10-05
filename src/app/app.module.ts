@@ -3,6 +3,7 @@ import { ViewRequestListPage } from './../pages/view-request-list/view-request-l
 import { ViewRequestedAllPage } from './../pages/view-requested-all/view-requested-all';
 import { UniqueDeviceID } from '@ionic-native/unique-device-id';
 import { MetroServiceProvider } from './../providers/metro-service/metro-service';
+import { DatePicker } from '@ionic-native/date-picker';
 
 // import { TimeService } from './../shared/time'
 import { ProfilePage } from './../pages/profile/profile';
@@ -111,6 +112,7 @@ import { Camera } from '@ionic-native/camera';
     BackgroundGeolocation,
     SplashScreen,
     NativeGeocoder,
+    DatePicker,
     UniqueDeviceID,
     Dialogs,
     Geolocation,Camera,
